@@ -1,7 +1,7 @@
 Package: HMMs
 Type: Package
 Title: Hidden Markov Models to analyse protein sequences
-Version: 1.0
+Version: 0.1
 Date: 2012-06-21
 Author: Nina Wilkinson
 Maintainer: Nina Wilkinson <nina.wilkinson@newcastle.ac.uk>
