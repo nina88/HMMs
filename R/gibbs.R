@@ -8,10 +8,14 @@
 
 #ic  = initialise_checkpoint(10)
 #gibbs(y, iter, ic)
-gibbs <- function(y, iter, mu, s, hour, r)##, checkpoint =NULL, prior)
+gibbs <- function(y, iter, hour, prior, r)##, checkpoint =NULL, prior)
 {
     if (class(y)!="hmm_fasta"){
         stop("Object y not from correct class")
+    }
+    
+    if (class(prior)!="prior_parameters"){
+      stop("Object prior not from correct class")
     }
     
     if(!is.null(checkpoint)){
@@ -27,11 +31,14 @@ gibbs <- function(y, iter, mu, s, hour, r)##, checkpoint =NULL, prior)
     y=factor(y,levels=1:f)
     
     ##### check for lambda and P existing/ initialise them
-    init = initialise(r, f)
+    init = initialise(prior, f, r)
     lambda = init$lambda
     P = init$P
     count=init$count
     segment1=init$segment1
+    ### Prior parameter for lambda
+    b=init$b
+    a=prior$a
     #### check not finished
     if (count==iter+1) break
     n = length(y)
@@ -43,12 +50,6 @@ gibbs <- function(y, iter, mu, s, hour, r)##, checkpoint =NULL, prior)
         lambda.store[1,]=as.vector(lambda)
         P.store[1,]=as.vector(P)
     }
-    ### Prior parameters
-    a = 1
-    c = ((mu^2*(1-mu))/(s^2))-mu
-    d = (c*(1-mu))/((r-1)*mu)
-    b = matrix(d, ncol=r, nrow=r)
-    diag(b) = c
     
     ##### FB and dirichlets
     for (i in count:iter) {
@@ -143,39 +144,59 @@ gibbs <- function(y, iter, mu, s, hour, r)##, checkpoint =NULL, prior)
 ##Change to initialise_state
 ##Have initialise_checkpoint
 
-initialise<- function(r, f)
+initialise<- function(prior, f, r)
 {
     if (file.exists("lambda.txt")==T & 
         file.exists("P.txt")==T & 
         file.exists("count.txt")==T & 
         file.exists("segment1.txt")==T){
             #message(Using existing files)
-            lambda=matrix(read.csv(file="lambda.txt")[,2],nrow=r,ncol=r)
-            P=array(read.csv("P.txt")[,2],c(f,f,r))
-            count=read.csv("count.txt")[,2]
-            segment1=read.csv("segment1.txt")[,2]
+            lambda = matrix(read.csv(file="lambda.txt")[,2],nrow=r,ncol=r)
+            P = array(read.csv("P.txt")[,2],c(f,f,r))
+            count = read.csv("count.txt")[,2]
+            segment1 = read.csv("segment1.txt")[,2]
     } else {
         #message(Making files)
-        P=array(0,c(f,f,r))
-        for(j in 1:r){
-            P[,,j] = rdiric(f,rep(1,f))
-        }
-        ## set up the Dirichlet parameters in a matrix
-        equiv.trans = 1000 ## equivalent number of transitions (per row), larger values mean less variability
-        diag.prob = 0.9    ## probability of staying in state i
-        aa = matrix((1-diag.prob)/(r-1),nrow=r,ncol=r)
-        diag(aa)=diag.prob
-        aa=equiv.trans*aa
-        ## generate initial probs for Lambda
-        lambda= matrix(0,nrow=r,ncol=r)
-        for(k in 1:r){
-            lambda[k,]=rdiric(1,aa[k,])
-        }
-        count=2
-        segment1=NA
+        transition_matrices = initialise_transition_matrices(prior, f, r)
+        lambda = transition_matrices$lambda
+        P = transition_matrices$P
+        b = transition_matrices$b
+        count = 2
+        segment1 = NA
     }
-    return(list(lambda = lambda, P = P, count = count, segment1 = segment1))
+    return(list(lambda = lambda, P = P, count = count, segment1 = segment1, b=b))
 }
+
+#initialise_transition_matrices
+initialise_transition_matrices <- function(prior, r, f)
+{ a=prior$a
+  P=array(0,c(f,f,r))
+  for(j in 1:r){
+    P[,,j] = rdiric(f,rep(a,f))
+  }
+  ### Prior parameters
+  mu=prior$mu
+  s=prior$s
+  c = ((mu^2*(1-mu))/(s^2))-mu
+  d = (c*(1-mu))/((r-1)*mu)
+  b = matrix(d, ncol=r, nrow=r)
+  diag(b) = c
+  lambda=matrix(0, nrow=r, ncol=r)
+  for (k in 1:r){
+    lambda[k,] = rdiric(1, b[k,])
+  }
+  return(list(lambda=lambda, P=P, b=b))
+}
+
+
+initialise_prior <- function(a, mu, s)
+{
+  prior = list(a=a, mu=mu, s=s)
+  class(prior) = "prior_parameters"
+  return(prior)
+}
+
+
 
 ##Create Checkpoint.RData file using load/save
 ##Include everything you need to checkpoint
