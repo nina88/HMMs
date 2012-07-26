@@ -12,7 +12,7 @@ gibbs <- function(y, iter, prior, r, checkpoint = NULL)
   
   if (is.null(checkpoint)){
     message("Note that you are not checkpointing, removing a burn in, or thinning")
-    checkpoint=initialise_checkpoint(0,1,1)
+    checkpoint=initialise_checkpoint(0, 1, 1)
     }
   
   if(class(checkpoint)!="hmm_checkpoint"){
@@ -115,15 +115,10 @@ gibbs <- function(y, iter, prior, r, checkpoint = NULL)
       post = loglike.store+log.prior
       
       ### temp store
-      print(store_count)
       posterior.temp[store_count]=post
-      print(posterior.temp)
       P.store[store_count,]=as.vector(P)
-      print(P.store)
       lambda.store[store_count,]=as.vector(lambda)
-      print(lambda.store)
       segment.store[store_count,]=segment2
-      print(segment.store)
         
       ## write lambda and P to file for checkpointing
       if (i%%hour==0) {
@@ -202,10 +197,10 @@ checkpoint <- function(lambda, P, segment1, posterior.temp, P.store, lambda.stor
 {
   count=i+1
   save(lambda,P,segment1,count,file="checkpoint.Rdata")
-  write.table(posterior.temp,file=paste("output",r,sep=""),append=T,row.names=F,col.names=F)
-  write.table(P.store,file=paste("P.store",r,sep=""),append=T,row.names=F,col.names=F)
-  write.table(lambda.store,file=paste("lambda.store",r,sep=""),append=T,row.names=F,col.names=F)
-  write.table(segment.store,file=paste("segment.store",r,sep=""),append=T,row.names=F,col.names=F)	
+  write.table(posterior.temp,file=paste("output",r,".csv",sep=""),append=T,row.names=F,col.names=F)
+  write.table(P.store,file=paste("P.store",r,".csv",sep=""),append=T,row.names=F,col.names=F)
+  write.table(lambda.store,file=paste("lambda.store",r,".csv",sep=""),append=T,row.names=F,col.names=F)
+  write.table(segment.store,file=paste("segment.store",r,".csv",sep=""),append=T,row.names=F,col.names=F)	
 }
 
 
@@ -247,3 +242,6 @@ log_likelihood=function(P,lambda,y.trans,s.trans,r,f)
   return(loglike.store)
 }
 
+###########
+
+#check_classes=function()
