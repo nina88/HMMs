@@ -12,13 +12,19 @@ gibbs <- function(y, iter, prior, r, checkpoint = NULL)
   
   if (is.null(checkpoint)){
     message("Note that you are not checkpointing, removing a burn in, or thinning")
-    checkpoint=initialise_checkpoint(1,1,1)
+    checkpoint=initialise_checkpoint(0,1,1)
     }
   
   if(class(checkpoint)!="hmm_checkpoint"){
     stop("Object checkpoint not from correct class")    
     }
   
+  ##### checkpoint arguments
+  hour = checkpoint$hour
+  thin = checkpoint$thin
+  burnin = checkpoint$burnin
+  
+  ##### sort out joins
   if (length(y$join)==2) {
     joins=0
     } else { 
@@ -37,6 +43,7 @@ gibbs <- function(y, iter, prior, r, checkpoint = NULL)
   P = init$P
   count=init$count
   segment1=init$segment1
+  store_count = 1
   
   ### Prior parameter for lambda
   b=prior$b
@@ -46,16 +53,16 @@ gibbs <- function(y, iter, prior, r, checkpoint = NULL)
   if (count==iter+1) break
   
   #### create storage vectors and matrices
-  posterior.temp=numeric(hour)
-  lambda.store=matrix(0,nrow=hour, ncol=r^2)
-  P.store=matrix(0,nrow=hour, ncol=r*f^2)
-  segment.store=matrix(0, nrow=hour, ncol=n)
+  posterior.temp = numeric(hour/thin)
+  lambda.store = matrix(0,nrow = hour/thin, ncol=r^2)
+  P.store = matrix(0,nrow = hour/thin, ncol=r*f^2)
+  segment.store=matrix(0, nrow = hour/thin, ncol=n)
   
   #### store initial values
-  if ((count-1)==1){
-    lambda.store[1,]=as.vector(lambda)
-    P.store[1,]=as.vector(P)
-    }
+  #if ((count-1)==1){
+    #lambda.store[1,]=as.vector(lambda)
+    #P.store[1,]=as.vector(P)
+    #}
   
   ##### FB and dirichlets
   for (i in count:iter) {
@@ -103,40 +110,46 @@ gibbs <- function(y, iter, prior, r, checkpoint = NULL)
     for (k in 1:r){
       lambda[k,] = rdiric(1, b[k,]+s.trans[k,])
       }
-    ### log prior
-    P.prior = sum((a-1)*log(P))+r*f*lgamma(f*a)-r*(f^2)*lgamma(a)
-    lambda.prior = sum((b-1)*log(lambda))+r*lgamma(sum(b[1,]))-r*sum(lgamma(b[1,]))
-    log.prior = P.prior+lambda.prior
+    
+   
+    if (i >= burnin & i%%thin==0){
+      
+      ### log prior
+      P.prior = sum((a-1)*log(P))+r*f*lgamma(f*a)-r*(f^2)*lgamma(a)
+      lambda.prior = sum((b-1)*log(lambda))+r*lgamma(sum(b[1,]))-r*sum(lgamma(b[1,]))
+      log.prior = P.prior+lambda.prior
         
-    ###### calculate log likelihood for transition probabilities (P)
-    P.loglike = numeric(r)
-    for (l in 1:r){
-      P.loglike[l]=sum(y.trans[,,l]*log(P[,,l]))
-      }
-    ###### calculate log likelihood for transition probabilities (lambda)
-    lambda.loglike = sum(s.trans*log(lambda))
-    
-    ##### find log like and log post
-    loglike.store = sum(P.loglike)+lambda.loglike+log(1/(f*r))
-    post = loglike.store+log.prior
-    
-    if (i%%hour==0){
-      posterior.temp[hour]=post
-      P.store[hour,]=as.vector(P)
-      lambda.store[hour,]=as.vector(lambda)
-      segment.store[hour,]=segment2
-      } else {
-        posterior.temp[i%%hour]=post
-        P.store[i%%hour,]=as.vector(P)
-        lambda.store[i%%hour,]=as.vector(lambda)
-        segment.store[i%%hour,]=segment2
+      ###### calculate log likelihood for transition probabilities (P)
+      P.loglike = numeric(r)
+      for (l in 1:r){
+        P.loglike[l]=sum(y.trans[,,l]*log(P[,,l]))
         }
-    ## write lambda and P to file for checkpointing
-    if (i%%hour==0){
-      checkpoint(lambda, P,segment1, posterior.temp, P.store, lambda.store, segment.store, i, r)
-      }
-    }  
-  return(list(lambda = lambda, P = P))
+      ###### calculate log likelihood for transition probabilities (lambda)
+      lambda.loglike = sum(s.trans*log(lambda))
+    
+      ##### find log like and log post
+      loglike.store = sum(P.loglike)+lambda.loglike+log(1/(f*r))
+      post = loglike.store+log.prior
+    
+      if (i%%hour==0){
+        posterior.temp[hour]=post
+        P.store[hour,]=as.vector(P)
+        lambda.store[hour,]=as.vector(lambda)
+        segment.store[hour,]=segment2
+        } else {
+          posterior.temp[i%%hour]=post
+          P.store[i%%hour,]=as.vector(P)
+          lambda.store[i%%hour,]=as.vector(lambda)
+          segment.store[i%%hour,]=segment2
+          }
+      ## write lambda and P to file for checkpointing
+      if (i%%hour==0){
+        checkpoint(lambda, P,segment1, posterior.temp, P.store, lambda.store, segment.store, i, r)
+        }
+      store_count = store_count + 1
+      } 
+  }
+    return(list(lambda = lambda, P = P))
 }
 
 ##Change .txt to csv
