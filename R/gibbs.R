@@ -1,4 +1,3 @@
-#initialise_prior
 #initialise_output
 #initialise_checkpoint = function(hour) {
     #do something
@@ -37,7 +36,7 @@ gibbs <- function(y, iter, hour, prior, r)##, checkpoint =NULL, prior)
     count=init$count
     segment1=init$segment1
     ### Prior parameter for lambda
-    b=init$b
+    b=prior$b
     a=prior$a
     #### check not finished
     if (count==iter+1) break
@@ -146,52 +145,46 @@ gibbs <- function(y, iter, hour, prior, r)##, checkpoint =NULL, prior)
 
 initialise<- function(prior, f, r)
 {
-    if (file.exists("lambda.txt")==T & 
-        file.exists("P.txt")==T & 
-        file.exists("count.txt")==T & 
-        file.exists("segment1.txt")==T){
-            #message(Using existing files)
-            lambda = matrix(read.csv(file="lambda.txt")[,2],nrow=r,ncol=r)
-            P = array(read.csv("P.txt")[,2],c(f,f,r))
-            count = read.csv("count.txt")[,2]
-            segment1 = read.csv("segment1.txt")[,2]
+    if (file.exists("checkpoint.Rdata")==T){
+            message("Using existing files")
+            load("checkpoint.Rdata")
     } else {
-        #message(Making files)
-        transition_matrices = initialise_transition_matrices(prior, f, r)
+        message("Making files")
+        transition_matrices = initialise_transition_matrices(prior, r, f)
         lambda = transition_matrices$lambda
         P = transition_matrices$P
-        b = transition_matrices$b
         count = 2
         segment1 = NA
     }
-    return(list(lambda = lambda, P = P, count = count, segment1 = segment1, b=b))
+    return(list(lambda = lambda, P = P, count = count, segment1 = segment1))
 }
 
 #initialise_transition_matrices
 initialise_transition_matrices <- function(prior, r, f)
-{ a=prior$a
+{ # P
+  a=prior$a
   P=array(0,c(f,f,r))
   for(j in 1:r){
     P[,,j] = rdiric(f,rep(a,f))
   }
-  ### Prior parameters
-  mu=prior$mu
-  s=prior$s
-  c = ((mu^2*(1-mu))/(s^2))-mu
-  d = (c*(1-mu))/((r-1)*mu)
-  b = matrix(d, ncol=r, nrow=r)
+  ### lambda 
+  b = prior$b
   diag(b) = c
   lambda=matrix(0, nrow=r, ncol=r)
   for (k in 1:r){
     lambda[k,] = rdiric(1, b[k,])
   }
-  return(list(lambda=lambda, P=P, b=b))
+  return(list(lambda=lambda, P=P))
 }
 
 
-initialise_prior <- function(a, mu, s)
+initialise_prior <- function(a, mu, s, r)
 {
-  prior = list(a=a, mu=mu, s=s)
+  c = ((mu^2*(1-mu))/(s^2))-mu
+  d = (c*(1-mu))/((r-1)*mu)
+  b = matrix(d, ncol=r, nrow=r)
+  diag(b) = c
+  prior = list(a=a, b=b)
   class(prior) = "prior_parameters"
   return(prior)
 }
@@ -204,12 +197,10 @@ initialise_prior <- function(a, mu, s)
 
 checkpoint <- function(lambda, P, segment1, posterior.temp, P.store, lambda.store, segment.store, i, r)
 {
-    write.csv(as.vector(lambda),file="lambda.txt")
-    write.csv(as.vector(P),file="P.txt")
-    write.csv(segment1,file="segment1.txt")
+    count=i+1
+    save(lambda,P,segment1,count,file="checkpoint.Rdata")
     write.table(posterior.temp,file=paste("output",r,sep=""),append=T,row.names=F,col.names=F)
     write.table(P.store,file=paste("P.store",r,sep=""),append=T,row.names=F,col.names=F)
     write.table(lambda.store,file=paste("lambda.store",r,sep=""),append=T,row.names=F,col.names=F)
-    write.table(segment.store,file=paste("segment.store",r,sep=""),append=T,row.names=F,col.names=F)
-    write.csv(i+1,file="count.txt")		
+    write.table(segment.store,file=paste("segment.store",r,sep=""),append=T,row.names=F,col.names=F)	
 }
