@@ -52,19 +52,12 @@ gibbs <- function(y, iter, prior, r, checkpoint = NULL)
   if (count==iter+1) break
   
   #### create storage vectors and matrices
-  print(hour)
-  print(thin)
-  posterior.temp = numeric(hour/thin)
-  lambda.store = matrix(0,nrow = hour/thin, ncol=r^2)
-  P.store = matrix(0,nrow = hour/thin, ncol=r*f^2)
-  segment.store=matrix(0, nrow = hour/thin, ncol=n)
+  ht = hour/thin
+  posterior.temp = numeric(ht)
+  lambda.store = matrix(0,nrow = ht, ncol=r^2)
+  P.store = matrix(0,nrow = ht, ncol=r*f^2)
+  segment.store=matrix(0, nrow = ht, ncol=n)
   store_count = 1
-  
-  #### store initial values
-  #if ((count-1)==1){
-    #lambda.store[1,]=as.vector(lambda)
-    #P.store[1,]=as.vector(P)
-    #}
   
   ##### FB and dirichlets
   for (i in count:iter) {
@@ -75,7 +68,7 @@ gibbs <- function(y, iter, prior, r, checkpoint = NULL)
     segment2 = st$s
         
     #### label switching check
-    if (i==2){
+    if (i==1){
       segment2 = segment2
       P = P
       lambda = lambda
@@ -116,21 +109,9 @@ gibbs <- function(y, iter, prior, r, checkpoint = NULL)
    
     if (i >= burnin & i%%thin==0){
       
-      ### log prior
-      P.prior = sum((a-1)*log(P))+r*f*lgamma(f*a)-r*(f^2)*lgamma(a)
-      lambda.prior = sum((b-1)*log(lambda))+r*lgamma(sum(b[1,]))-r*sum(lgamma(b[1,]))
-      log.prior = P.prior+lambda.prior
-        
-      ###### calculate log likelihood for transition probabilities (P)
-      P.loglike = numeric(r)
-      for (l in 1:r){
-        P.loglike[l]=sum(y.trans[,,l]*log(P[,,l]))
-        }
-      ###### calculate log likelihood for transition probabilities (lambda)
-      lambda.loglike = sum(s.trans*log(lambda))
-    
-      ##### find log like and log post
-      loglike.store = sum(P.loglike)+lambda.loglike+log(1/(f*r))
+      ### log posterior
+      log.prior = log_prior(P, lambda, a, b, r, f)
+      loglike.store = log_likelihood(P, lambda, y.trans, s.trans, r, f)  
       post = loglike.store+log.prior
       
       ### temp store
@@ -149,7 +130,11 @@ gibbs <- function(y, iter, prior, r, checkpoint = NULL)
         checkpoint(lambda, P,segment1, posterior.temp, P.store, lambda.store, segment.store, i, r)
       }
       store_count = store_count + 1
-      if (store_count == hour/thin+1){
+      if (store_count == ht+1){
+        posterior.temp = numeric(ht)
+        lambda.store = matrix(0,nrow = ht, ncol=r^2)
+        P.store = matrix(0,nrow = ht, ncol=r*f^2)
+        segment.store=matrix(0, nrow = ht, ncol=n)
         store_count=1
       }
       } 
@@ -173,7 +158,7 @@ initialise<- function(prior, f, r)
       transition_matrices = initialise_transition_matrices(prior, r, f)
       lambda = transition_matrices$lambda
       P = transition_matrices$P
-      count = 2
+      count = 1
       segment1 = NA
       }
   return(list(lambda = lambda, P = P, count = count, segment1 = segment1))
@@ -235,3 +220,30 @@ initialise_checkpoint = function(burnin, thin, hour)
   class(checkpoint)="hmm_checkpoint"
   return(checkpoint)
 }
+
+##### find log prior
+
+log_prior=function(P, lambda, a, b, r, f)
+{
+  P.prior = sum((a-1)*log(P))+r*f*lgamma(f*a)-r*(f^2)*lgamma(a)
+  lambda.prior = sum((b-1)*log(lambda))+r*lgamma(sum(b[1,]))-r*sum(lgamma(b[1,]))
+  log.prior = P.prior+lambda.prior
+  return(log.prior)
+}
+
+### find log likelihood
+log_likelihood=function(P,lambda,y.trans,s.trans,r,f)
+{
+  ###### calculate log likelihood for transition probabilities (P)
+  P.loglike = numeric(r)
+  for (l in 1:r){
+    P.loglike[l]=sum(y.trans[,,l]*log(P[,,l]))
+  }
+  ###### calculate log likelihood for transition probabilities (lambda)
+  lambda.loglike = sum(s.trans*log(lambda))
+  
+  ##### find log like and log post
+  loglike.store = sum(P.loglike)+lambda.loglike+log(1/(f*r))
+  return(loglike.store)
+}
+
