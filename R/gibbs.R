@@ -43,7 +43,6 @@ gibbs <- function(y, iter, prior, r, checkpoint = NULL)
   P = init$P
   count=init$count
   segment1=init$segment1
-  store_count = 1
   
   ### Prior parameter for lambda
   b=prior$b
@@ -53,10 +52,13 @@ gibbs <- function(y, iter, prior, r, checkpoint = NULL)
   if (count==iter+1) break
   
   #### create storage vectors and matrices
+  print(hour)
+  print(thin)
   posterior.temp = numeric(hour/thin)
   lambda.store = matrix(0,nrow = hour/thin, ncol=r^2)
   P.store = matrix(0,nrow = hour/thin, ncol=r*f^2)
   segment.store=matrix(0, nrow = hour/thin, ncol=n)
+  store_count = 1
   
   #### store initial values
   #if ((count-1)==1){
@@ -130,23 +132,26 @@ gibbs <- function(y, iter, prior, r, checkpoint = NULL)
       ##### find log like and log post
       loglike.store = sum(P.loglike)+lambda.loglike+log(1/(f*r))
       post = loglike.store+log.prior
-    
-      if (i%%hour==0){
-        posterior.temp[hour]=post
-        P.store[hour,]=as.vector(P)
-        lambda.store[hour,]=as.vector(lambda)
-        segment.store[hour,]=segment2
-        } else {
-          posterior.temp[i%%hour]=post
-          P.store[i%%hour,]=as.vector(P)
-          lambda.store[i%%hour,]=as.vector(lambda)
-          segment.store[i%%hour,]=segment2
-          }
+      
+      ### temp store
+      print(store_count)
+      posterior.temp[store_count]=post
+      print(posterior.temp)
+      P.store[store_count,]=as.vector(P)
+      print(P.store)
+      lambda.store[store_count,]=as.vector(lambda)
+      print(lambda.store)
+      segment.store[store_count,]=segment2
+      print(segment.store)
+        
       ## write lambda and P to file for checkpointing
-      if (i%%hour==0){
+      if (i%%hour==0) {
         checkpoint(lambda, P,segment1, posterior.temp, P.store, lambda.store, segment.store, i, r)
-        }
+      }
       store_count = store_count + 1
+      if (store_count == hour/thin+1){
+        store_count=1
+      }
       } 
   }
     return(list(lambda = lambda, P = P))
@@ -226,7 +231,7 @@ initialise_checkpoint = function(burnin, thin, hour)
     stop("Hour must be a multiple of thin")
   }
   
-  checkpoint=list(burnin,thin, hour)
-  class("hmm_checkpoint")
+  checkpoint=list(burnin=burnin, thin=thin, hour=hour)
+  class(checkpoint)="hmm_checkpoint"
   return(checkpoint)
 }
