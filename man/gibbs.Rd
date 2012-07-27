@@ -14,15 +14,14 @@ Gibbs sampling
 Gibbs sampling for HMMs
 }
 \usage{
-gibbs(y, iter, mu, s, hour, r)
+gibbs(y, iter, prior, r, checkpoint = NULL)
 }
 \arguments{
   \item{y}{hmm_fasta object}
   \item{iter}{number of iterations}
-  \item{mu}{mean}
-  \item{s}{standard deviation}
-  \item{hour}{checkpoint iteration number}
-  \item{r}{number of segments}
+  \item{prior}{prior object}
+  \item{r}{number of hidden states}
+  \item{checkpoint}{checkpoint object if checkpointing is required. If NULL it is carried out every iteration.}
 }
 \details{}
 \value{
