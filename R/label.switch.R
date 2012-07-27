@@ -1,3 +1,7 @@
+####################################################
+#Public functions
+####################################################
+
 label_switch <-
     function(segment.store2,segment.store1, r, lambda, P, f)
     {
@@ -38,6 +42,10 @@ label_switch <-
         return(list(segment.store2=segment.store3, P=new.P, lambda=new.lambda))
         
     }
+
+####################################################
+#Private functions
+####################################################
 
 permut <-
     function(r, segments, i) {

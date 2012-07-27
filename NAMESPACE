@@ -5,5 +5,8 @@ export(gibbs,
         label_switch,
         read_FASTA,
         combine_FASTA,
-       hmm.sim)
+       hmm.sim,
+       initialise_checkpoint,
+        initialise_prior,
+         FB)
 

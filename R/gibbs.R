@@ -1,3 +1,7 @@
+####################################################
+#Public functions
+####################################################
+
 #initialise_output
 
 gibbs <- function(y, iter, prior, r, checkpoint = NULL)
@@ -137,47 +141,11 @@ gibbs <- function(y, iter, prior, r, checkpoint = NULL)
     return(list(lambda = lambda, P = P))
 }
 
-##Change .txt to csv
 ##Pass output files as arguments
 ##Restart argument =TRUE or FALSE
 ##Change to initialise_state
 
 
-initialise<- function(prior, f, r)
-{
-  if (file.exists("checkpoint.Rdata")==T){
-    message("Using existing files")
-    load("checkpoint.Rdata")
-    } else {
-      message("Making files")
-      transition_matrices = initialise_transition_matrices(prior, r, f)
-      lambda = transition_matrices$lambda
-      P = transition_matrices$P
-      count = 1
-      segment1 = NA
-      }
-  return(list(lambda = lambda, P = P, count = count, segment1 = segment1))
-}
-
-#initialise_transition_matrices
-initialise_transition_matrices <- function(prior, r, f)
-{ 
-  # P
-  a=prior$a
-  P=array(0,c(f,f,r))
-  for(j in 1:r){
-    P[,,j] = rdiric(f,rep(a,f))
-  }
-  
-  ### lambda 
-  b = prior$b
-  diag(b) = c
-  lambda=matrix(0, nrow=r, ncol=r)
-  for (k in 1:r){
-    lambda[k,] = rdiric(1, b[k,])
-  }
-  return(list(lambda=lambda, P=P))
-}
 
 
 initialise_prior <- function(a, mu, s, r)
@@ -189,18 +157,6 @@ initialise_prior <- function(a, mu, s, r)
   prior = list(a=a, b=b)
   class(prior) = "prior_parameters"
   return(prior)
-}
-
-##Store thin, burnin in checkpointing
-
-checkpoint <- function(lambda, P, segment1, posterior.temp, P.store, lambda.store, segment.store, i, r)
-{
-  count=i+1
-  save(lambda,P,segment1,count,file="checkpoint.Rdata")
-  write.table(posterior.temp,file=paste("output",r,".csv",sep=""),append=T,row.names=F,col.names=F)
-  write.table(P.store,file=paste("P.store",r,".csv",sep=""),append=T,row.names=F,col.names=F)
-  write.table(lambda.store,file=paste("lambda.store",r,".csv",sep=""),append=T,row.names=F,col.names=F)
-  write.table(segment.store,file=paste("segment.store",r,".csv",sep=""),append=T,row.names=F,col.names=F)	
 }
 
 
@@ -216,6 +172,21 @@ initialise_checkpoint = function(burnin, thin, hour)
   return(checkpoint)
 }
 
+####################################################
+#Private functions
+####################################################
+
+##Store thin, burnin in checkpointing
+
+checkpoint <- function(lambda, P, segment1, posterior.temp, P.store, lambda.store, segment.store, i, r)
+{
+  count=i+1
+  save(lambda,P,segment1,count,file="checkpoint.Rdata")
+  write.table(posterior.temp,file=paste("output",r,".csv",sep=""),append=T,row.names=F,col.names=F)
+  write.table(P.store,file=paste("P.store",r,".csv",sep=""),append=T,row.names=F,col.names=F)
+  write.table(lambda.store,file=paste("lambda.store",r,".csv",sep=""),append=T,row.names=F,col.names=F)
+  write.table(segment.store,file=paste("segment.store",r,".csv",sep=""),append=T,row.names=F,col.names=F)  
+}
 ##### find log prior
 
 log_prior=function(P, lambda, a, b, r, f)
@@ -244,4 +215,40 @@ log_likelihood=function(P,lambda,y.trans,s.trans,r,f)
 
 ###########
 
-#check_classes=function()
+
+initialise<- function(prior, f, r)
+{
+  if (file.exists("checkpoint.Rdata")==T){
+    message("Using existing files")
+    load("checkpoint.Rdata")
+  } else {
+    message("Making files")
+    transition_matrices = initialise_transition_matrices(prior, r, f)
+    lambda = transition_matrices$lambda
+    P = transition_matrices$P
+    count = 1
+    segment1 = NA
+  }
+  return(list(lambda = lambda, P = P, count = count, segment1 = segment1))
+}
+
+#initialise_transition_matrices
+initialise_transition_matrices <- function(prior, r, f)
+{ 
+  # P
+  a=prior$a
+  P=array(0,c(f,f,r))
+  for(j in 1:r){
+    P[,,j] = rdiric(f,rep(a,f))
+  }
+  
+  ### lambda 
+  b = prior$b
+  diag(b) = c
+  lambda=matrix(0, nrow=r, ncol=r)
+  for (k in 1:r){
+    lambda[k,] = rdiric(1, b[k,])
+  }
+  return(list(lambda=lambda, P=P))
+}
+
