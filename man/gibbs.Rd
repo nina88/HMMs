@@ -14,14 +14,16 @@ Gibbs sampling
 Gibbs sampling for HMMs
 }
 \usage{
-gibbs(y, iter, prior, r, checkpoint = NULL)
+gibbs(y, iter, prior, r, burnin, thin, checkpoint = NULL)
 }
 \arguments{
   \item{y}{hmm_fasta object}
   \item{iter}{number of iterations}
   \item{prior}{prior object}
   \item{r}{number of hidden states}
-  \item{checkpoint}{checkpoint object if checkpointing is required. If NULL it is carried out every iteration.}
+  \item{checkpoint}{checkpoint object if checkpointing is required. If NULL it is carried out every iteration. Make checkpoint a multiple of thin}
+  \item{thin}{what you would like to thin the results by}
+  \item{burnin}{burnin size you would like to remove}
 }
 \details{}
 \value{
