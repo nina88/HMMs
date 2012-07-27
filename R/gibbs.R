@@ -4,29 +4,9 @@
 
 #initialise_output
 
-gibbs <- function(y, iter, prior, r, checkpoint = NULL)
+gibbs <- function(y, iter, prior, r, burnin, thin, checkpoint = NULL)
 {
-  if (class(y)!="hmm_fasta"){
-    stop("Object y not from correct class")
-    }
-  
-  if (class(prior)!="prior_parameters"){
-    stop("Object prior not from correct class")
-    }
-  
-  if (is.null(checkpoint)){
-    message("Note that you are not checkpointing, removing a burn in, or thinning")
-    checkpoint=initialise_checkpoint(0, 1, 1)
-    }
-  
-  if(class(checkpoint)!="hmm_checkpoint"){
-    stop("Object checkpoint not from correct class")    
-    }
-  
-  ##### checkpoint arguments
-  hour = checkpoint$hour
-  thin = checkpoint$thin
-  burnin = checkpoint$burnin
+  hour=class_check(y, prior, checkpoint, iter, thin)
   
   ##### sort out joins
   if (length(y$join)==2) {
@@ -138,15 +118,11 @@ gibbs <- function(y, iter, prior, r, checkpoint = NULL)
       }
       } 
   }
-    return(list(lambda = lambda, P = P))
 }
 
 ##Pass output files as arguments
 ##Restart argument =TRUE or FALSE
 ##Change to initialise_state
-
-
-
 
 initialise_prior <- function(a, mu, s, r)
 {
@@ -161,20 +137,43 @@ initialise_prior <- function(a, mu, s, r)
 
 
 #########
-initialise_checkpoint = function(burnin, thin, hour) 
+initialise_checkpoint = function(hour) 
 {
-  if (hour%%thin!=0){
-    stop("Hour must be a multiple of thin")
-  }
-  
-  checkpoint=list(burnin=burnin, thin=thin, hour=hour)
-  class(checkpoint)="hmm_checkpoint"
-  return(checkpoint)
+  class(hour)="hmm_checkpoint"
+  return(hour)
 }
 
 ####################################################
 #Private functions
 ####################################################
+
+class_check <- function(y, prior, checkpoint, iter, thin)
+{
+  if (class(y)!="hmm_fasta"){
+    stop("Object y not from correct class")
+  }
+  
+  if (class(prior)!="prior_parameters"){
+    stop("Object prior not from correct class")
+  }
+  
+  if (is.null(checkpoint)){
+    message("Note that you are not checkpointing")
+    hour=iter
+  } else if (class(checkpoint)!="hmm_checkpoint")
+  {
+    stop("Object checkpoint not from correct class")
+  }
+  
+  ##### checkpoint arguments
+  if (!is.null(checkpoint)){
+    hour = checkpoint
+    if (hour%%thin!=0){
+      stop("Hour and iter must be a multiple of thin")
+    }
+  }
+  return(hour)
+}
 
 ##Store thin, burnin in checkpointing
 
