@@ -244,7 +244,6 @@ initialise_transition_matrices <- function(prior, r, f)
   
   ### lambda 
   b = prior$b
-  diag(b) = c
   lambda=matrix(0, nrow=r, ncol=r)
   for (k in 1:r){
     lambda[k,] = rdiric(1, b[k,])
