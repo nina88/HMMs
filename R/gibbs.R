@@ -22,7 +22,7 @@ gibbs <- function(y, iter, prior, r, burnin, thin, checkpoint = NULL)
   n = length(y)
   
   ##### check for lambda and P existing/ initialise them
-  init = initialise(prior, f, r)
+  init = initialise(prior, f, r, checkpoint)
   lambda = init$lambda
   P = init$P
   count=init$count
@@ -33,7 +33,10 @@ gibbs <- function(y, iter, prior, r, burnin, thin, checkpoint = NULL)
   a=prior$a
     
   #### check not finished
-  if (count==iter+1) break
+  if (count==iter+1) {
+    message("Maximum iterations reached")
+    break
+  }
   
   #### create storage vectors and matrices
   ht = hour/thin
@@ -106,7 +109,7 @@ gibbs <- function(y, iter, prior, r, burnin, thin, checkpoint = NULL)
         
       ## write lambda and P to file for checkpointing
       if (i%%hour==0) {
-        checkpoint(lambda, P,segment1, posterior.temp, P.store, lambda.store, segment.store, i, r)
+        checkpoint_files(lambda, P,segment1, posterior.temp, P.store, lambda.store, segment.store, i, r, checkpoint)
       }
       store_count = store_count + 1
       if (store_count == ht+1){
@@ -137,10 +140,11 @@ initialise_prior <- function(a, mu, s, r)
 
 
 #########
-initialise_checkpoint = function(hour) 
-{
-  class(hour)="hmm_checkpoint"
-  return(hour)
+initialise_checkpoint = function(filename, hour) 
+{ 
+  cp=list(filename=filename, hour=hour)
+  class(cp)="hmm_checkpoint"
+  return(cp)
 }
 
 ####################################################
@@ -167,7 +171,8 @@ class_check <- function(y, prior, checkpoint, iter, thin)
   
   ##### checkpoint arguments
   if (!is.null(checkpoint)){
-    hour = checkpoint
+    hour = checkpoint$hour
+    expect_that(cp$filename, matches(".Rdata"))
     if (hour%%thin!=0){
       stop("Hour and iter must be a multiple of thin")
     }
@@ -177,10 +182,12 @@ class_check <- function(y, prior, checkpoint, iter, thin)
 
 ##Store thin, burnin in checkpointing
 
-checkpoint <- function(lambda, P, segment1, posterior.temp, P.store, lambda.store, segment.store, i, r)
+checkpoint_files <- function(lambda, P, segment1, posterior.temp, P.store, lambda.store, segment.store, i, r, checkpoint)
 {
   count=i+1
-  save(lambda,P,segment1,count,file="checkpoint.Rdata")
+  if (!is.null(checkpoint)){
+    save(lambda,P,segment1,count,file=checkpoint$filename)
+  } 
   write.table(posterior.temp,file=paste("output",r,".csv",sep=""),append=T,row.names=F,col.names=F)
   write.table(P.store,file=paste("P.store",r,".csv",sep=""),append=T,row.names=F,col.names=F)
   write.table(lambda.store,file=paste("lambda.store",r,".csv",sep=""),append=T,row.names=F,col.names=F)
@@ -215,11 +222,11 @@ log_likelihood=function(P,lambda,y.trans,s.trans,r,f)
 ###########
 
 
-initialise<- function(prior, f, r)
-{
-  if (file.exists("checkpoint.Rdata")==T){
+initialise<- function(prior, f, r, checkpoint)
+{ 
+  if (!is.null(checkpoint)){
     message("Using existing files")
-    load("checkpoint.Rdata")
+    load(checkpoint$filename)
   } else {
     message("Making files")
     transition_matrices = initialise_transition_matrices(prior, r, f)
