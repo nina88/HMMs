@@ -2,6 +2,11 @@
 \alias{gibbs}
 \alias{initialise}
 \alias{checkpoint}
+\alias{initialise_prior}
+\alias{initialise_checkpoint}
+\alias{log_prior}
+\alias{log_likelihood}
+\alias{initialise_transition_matrices}
 \title{
 Gibbs sampling
 }
