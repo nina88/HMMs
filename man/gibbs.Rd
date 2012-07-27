@@ -7,6 +7,7 @@
 \alias{log_prior}
 \alias{log_likelihood}
 \alias{initialise_transition_matrices}
+\alias{class_check}
 \title{
 Gibbs sampling
 }
