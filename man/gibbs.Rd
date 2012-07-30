@@ -22,7 +22,7 @@ gibbs(y, iter, prior, r, burnin, thin, checkpoint = NULL)
   \item{iter}{number of iterations}
   \item{prior}{prior object}
   \item{r}{number of hidden states}
-  \item{checkpoint}{checkpoint object if checkpointing is required. If NULL it is carried out every iteration. Make checkpoint a multiple of thin}
+  \item{checkpoint}{checkpoint object if checkpointing is required. Make checkpoint a multiple of thin}
   \item{thin}{what you would like to thin the results by}
   \item{burnin}{burnin size you would like to remove}
 }
