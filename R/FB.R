@@ -69,5 +69,5 @@ function(y, lambda, P)
   }
   
   ## return the global estimate
-  return(list(s = s, xi=xi,back=back))
+  return(list(s = s, xi=xi, back=back, f=f))
 }
