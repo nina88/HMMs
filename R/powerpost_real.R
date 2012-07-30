@@ -70,7 +70,7 @@ FBpower = function(y, lambda, P, t)
 powerpost=function(N, prior, m, r, y, burnin, checkpoint=NULL){
   
   ### insert class checks here  
-  
+  class_check_power(y, prior, checkpoint)
   ##### sort out joins
   if (length(y$join)==2) {
     joins=0
@@ -182,7 +182,7 @@ checkpoint_files_power <- function(lambda, P, expectation, count, i, checkpoint)
   }  
 }
 
-class_check_power <- function(y, prior, checkpoint, iter, thin)
+class_check_power <- function(y, prior, checkpoint)
 {
   if (class(y)!="hmm_fasta"){
     stop("Object y not from correct class")
@@ -194,7 +194,6 @@ class_check_power <- function(y, prior, checkpoint, iter, thin)
   
   if (is.null(checkpoint)){
     message("Note that you are not checkpointing")
-    hour=iter
   } else if (class(checkpoint)!="hmm_checkpoint")
   {
     stop("Object checkpoint not from correct class")
@@ -202,13 +201,8 @@ class_check_power <- function(y, prior, checkpoint, iter, thin)
   
   ##### checkpoint arguments
   if (!is.null(checkpoint)){
-    hour = checkpoint$hour
     expect_that(cp$filename, matches(".Rdata"))
-    if (hour%%thin!=0){
-      stop("Hour and iter must be a multiple of thin")
-    }
   }
-  return(hour)
 }
 
 initialise_power<- function(prior, f, r, checkpoint)
