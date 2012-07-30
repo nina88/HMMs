@@ -205,7 +205,7 @@ class_check_power <- function(y, prior, checkpoint)
   }
 }
 
-initialise_power<- function(prior, f, r, checkpoint)
+initialise_power<- function(prior, f, r, checkpoint, N)
 { 
   if (is.null(checkpoint)) {
     message("Making files")
