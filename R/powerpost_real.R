@@ -255,6 +255,3 @@ initialise_checkpoint_power = function(filename)
   class(cp)="hmm_checkpoint"
   return(cp)
 }
-
-
-# powerpost(40,0.99,0.01,iterations,r,f,y,4000,joins)
