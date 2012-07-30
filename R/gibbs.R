@@ -172,7 +172,7 @@ class_check <- function(y, prior, checkpoint, iter, thin)
   ##### checkpoint arguments
   if (!is.null(checkpoint)){
     hour = checkpoint$hour
-    expect_that(cp$filename, matches(".Rdata"))
+    expect_that(checkpoint$filename, matches(".Rdata"))
     if (hour%%thin!=0){
       stop("Hour and iter must be a multiple of thin")
     }

@@ -201,7 +201,7 @@ class_check_power <- function(y, prior, checkpoint)
   
   ##### checkpoint arguments
   if (!is.null(checkpoint)){
-    expect_that(cp$filename, matches(".Rdata"))
+    expect_that(checkpoint$filename, matches(".Rdata"))
   }
 }
 
