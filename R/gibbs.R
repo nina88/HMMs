@@ -224,7 +224,14 @@ log_likelihood=function(P,lambda,y.trans,s.trans,r,f)
 
 initialise<- function(prior, f, r, checkpoint)
 { 
-  if (!is.null(checkpoint)){
+  if (is.null(checkpoint)) {
+    message("Making files")
+    transition_matrices = initialise_transition_matrices(prior, r, f)
+    lambda = transition_matrices$lambda
+    P = transition_matrices$P
+    count = 1
+    segment1 = NA
+  } else if (!is.null(checkpoint) & file.exists(checkpoint$filename)){
     message("Using existing files")
     load(checkpoint$filename)
   } else {
