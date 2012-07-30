@@ -1,3 +1,7 @@
+####################################################
+#Public functions
+####################################################
+
 ##### took out lambdas to the power of t
 FBpower = function(y, lambda, P, t)
 {
@@ -170,6 +174,19 @@ powerpost=function(N, prior, m, r, y, burnin, checkpoint=NULL){
   return(list(logpPP=logpPP))
 }
 
+#########
+
+initialise_checkpoint_power = function(filename) 
+{ 
+  cp=list(filename=filename)
+  class(cp)="hmm_checkpoint"
+  return(cp)
+}
+
+####################################################
+#Private functions
+####################################################
+
 ####################################################################################################
 ####################################################################################################
 ### note needs to be changed
@@ -243,9 +260,4 @@ initialise_transition_matrices_power <- function(r, f)
 }
 
 #########
-initialise_checkpoint_power = function(filename) 
-{ 
-  cp=list(filename=filename)
-  class(cp)="hmm_checkpoint"
-  return(cp)
-}
+
