@@ -1,9 +1,9 @@
 ##### took out lambdas to the power of t
-FBpower = function(y, lambda, p, t)
+FBpower = function(y, lambda, P, t)
 {
   n = length(y)
   r = dim(lambda)[1]
-  h = dim(p)[1]
+  h = dim(P)[1]
  
   ## filtered probabilities
   f = matrix(0, nrow=r, ncol=n)
@@ -23,11 +23,11 @@ FBpower = function(y, lambda, p, t)
   pi.P = array(0,c(h,r))
   
   for(i in 1:r){
-      pi.P[,i] = equil(p[,,i])
+      pi.P[,i] = equil(P[,,i])
       }
   
   pi.P=pi.P^t
-  p=p^t
+  P=P^t
   pi.lambda = equil(lambda)
   
   xi[1] = sum(pi.P[y[1], ]*pi.lambda)
@@ -39,7 +39,7 @@ FBpower = function(y, lambda, p, t)
 
   for(i in 2:n){
     for(k in 1:r){
-      f[k, i] = p[y[i-1], y[i], k]*sum(lambda[ ,k]*f[ ,i-1])
+      f[k, i] = P[y[i-1], y[i], k]*sum(lambda[ ,k]*f[ ,i-1])
     } 
     xi[i]=sum(f[ ,i])
     f[ ,i] = f[ ,i]/xi[i]
