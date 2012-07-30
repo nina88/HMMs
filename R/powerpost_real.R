@@ -67,41 +67,45 @@ FBpower = function(y, lambda, p, t)
 
 ####################################
 
-powerpost=function(N, mu, s, m, r, f, y, K, joins){
+powerpost=function(N, prior, m, r, y, K, checkpoint){
   
-  expectation=numeric(N+1)
-  n=length(y)
-  if (file.exists("count.txt")==T & file.exists("lambda.txt")==T & file.exists("P.txt")==T & file.exists("expectation.txt")==T){
-    count=read.csv("count.txt")[,2]
-    lambda=matrix(read.csv(file="lambda.txt")[,2],nrow=r,ncol=r)
-    P=array(read.csv("P.txt")[,2],c(f,f,r))
-    expectation[1:count]=read.table(file=paste("expectation.txt"))[1:count,]
-  } else {
-    count=0
-    #### step 1: initialise theta at prior mean
-    P=array(1/f,c(f,f,r)) 
-    diag.prob = 0.9    ## probability of staying in state i
-    lambda = matrix((1-diag.prob)/(r-1),nrow=r,ncol=r)
-    for(k in 1:r){
-    lambda[k,k]=diag.prob
-    }
+  ### inset class checks here  
+  
+  ##### sort out joins
+  if (length(y$join)==2) {
+    joins=0
+  } else { 
+    joins=y$join[2:(length(y$join)-1)]
   }
+  
+  #### find sequence and f and length of y (n)
+  f=y$level
+  y=y$fasta_seq
+  y=factor(y,levels=1:f)
+  n = length(y)
+  
+  
+ 
+ 
+
+  
+  ##### check for lambda and P existing/ initialise them
+  init = initialise_power(prior, f, r, checkpoint)
+  lambda = init$lambda
+  P = init$P
+  expectation=init$expectation
+  count=init$count
+  
   
   ### Prior parameters
-  a = 1
-  c = ((mu^2*(1-mu))/(s^2))-mu
-  d = (c*(1-mu))/((r-1)*mu)
-  b = matrix(d, ncol=r, nrow=r)
-  for (k in 1:r){
-      b[k,k] = c
-  }
+  b=prior$b
+  a=prior$a
      
  ### step 2: a: set up temperature parameter t_i (in loop)
   loglike.store=numeric(m)
   
  ### step 2: b: generate sample of theta from the power posterior
   for (i in count:N){
-        #t=T[i+1]
         t=(i/N)^4
         print(t)
         #### need a,b s.trans and y.trans from gibbs sampling
@@ -186,119 +190,73 @@ powerpost=function(N, mu, s, m, r, f, y, K, joins){
 
 ####################################################################################################
 ####################################################################################################
-###other required funtions
-rdiric <- function(n,a) {
-        p <- length(a)
-        m <- matrix(nrow=n,ncol=p)
-        for (i in 1:p) {
-                m[,i] <- rgamma(n,a[i])
-        }
-        sumvec <- m %*% rep(1,p)
-        m / as.vector(sumvec)
-}
+### note needs to be changed
 
-
-equil = function(P)
+class_check_power <- function(y, prior, checkpoint, iter, thin)
 {
-  ev = eigen(t(P))$vectors[,1]
-  return(Re(ev/sum(ev)))
-}
-
-#hmm.sim = function(n,lambda,P,f)
-#{
+  if (class(y)!="hmm_fasta"){
+    stop("Object y not from correct class")
+  }
   
-  ## first simulate the hidden states (segmentation)
-#  r = dim(lambda)[1]
- # pi.lam = equil(lambda)
-#  s = numeric(n)
-#  s[1] = sample(1:r,1,replace=TRUE,prob=pi.lam)
-#  for(t in 2:n){
- #   s[t] = sample(1:r,1,replace=TRUE,prob=lambda[match(s[t-1],1:r),])
- # }
-  ## then simulate the observed states (conditional on s)
-#  pi.P = array(0,c(f,r))
- # for(i in 1:r){
-#    pi.P[,i] = equil(P[,,i])
-#  }
-#  y = numeric(n)
- # y[1] <- sample(1:f,1,replace=TRUE,prob=pi.P[,s[1]])
-#  for(t in 2:n){
-#    y[t] <- sample(1:f,1,replace=TRUE,prob=P[y[t-1],,s[t]])
- # }
-#  list(s=s,y=y)
-#}
-################################################################################
-read.FASTA <- function(filename="")
-{
-  strsplit(paste(scan(filename,skip=1,what="character",comment.char=";"),collapse=""),"")[[1]]
+  if (class(prior)!="prior_parameters"){
+    stop("Object prior not from correct class")
+  }
+  
+  if (is.null(checkpoint)){
+    message("Note that you are not checkpointing")
+    hour=iter
+  } else if (class(checkpoint)!="hmm_checkpoint")
+  {
+    stop("Object checkpoint not from correct class")
+  }
+  
+  ##### checkpoint arguments
+  if (!is.null(checkpoint)){
+    hour = checkpoint$hour
+    expect_that(cp$filename, matches(".Rdata"))
+    if (hour%%thin!=0){
+      stop("Hour and iter must be a multiple of thin")
+    }
+  }
+  return(hour)
 }
 
-## convert amino acids to hydrophilic or hydrophobic
-convert4 <- function(x,frm=c(LETTERS[c(1,3:9,11:14, 16:20,22,23,25)]),to=c(1,1,2,2,1,1,2,1,2,1,1,2,1,2,2,2,2,1,1,1))
-{
-  to[match(x,frm)]
-}
-#### convert to charge
-convert5 <- function(x,frm=c(LETTERS[c(1,3:9,11:14, 16:20,22,23,25)]),to=c(1,1,3,3,1,1,1,1,2,1,1,1,1,1,2,1,1,1,1,1))
-{
-  to[match(x,frm)]
-}
-### covvery charge and hydrophobicity
-convert6 <- function(x,frm=c(LETTERS[c(1,3:9,11:14, 16:20,22,23,25)]),to=c(1,1,4,4,1,1,2,1,3,1,1,2,1,2,3,2,2,1,1,1))
-{
-  to[match(x,frm)]
-}
+initialise<- function(prior, f, r, checkpoint)
+{ 
+  if (is.null(checkpoint)) {
+    message("Making files")
+    transition_matrices = initialise_transition_matrices_power(r, f)
+    lambda = transition_matrices$lambda
+    P = transition_matrices$P
+    count = 0
+    expectation=numeric(N+1)
 
-##############################################################################
-x=read.csv(file="data.dat")
-r=x[1,2]
-iterations=x[2,2]
-f=x[3,2]
-concat=x[4,2]
-
-x1=read.FASTA(filename="p53.txt")
-x2=read.FASTA(filename="mdm2.txt")
-
-if (f==2){
-  x1=convert4(x1)
-  x2=convert4(x2)
-
-}
-if (f==3) {
-x1=convert5(x1)
-x2=convert5(x2)
-
-}
-if (f==4){
-  x1=convert6(x1)
-  x2=convert6(x2)
-
+  } else if (!is.null(checkpoint) & file.exists(checkpoint$filename)){
+    message("Using existing files")
+    load(checkpoint$filename)
+  } else {
+    message("Making files")
+    transition_matrices = initialise_transition_matrices_power(r, f)
+    lambda = transition_matrices$lambda
+    P = transition_matrices$P
+    count = 0
+    expectation=numeric(N+1)
+  }
+  return(list(lambda = lambda, P = P, count = count, expectation = expectation))
 }
 
-y1=c(x1,x2)
-y=rep(y1,concat)
-y=factor(y,levels=1:f)
 
-###### calculate joins by arithmetic progression
-#a=seq(1,(2*concat-1),2)
-#b=seq(2,2*concat,2)
-#joins=numeric(2*concat)
-#p=numeric(concat)
-#q=numeric(concat)
-#p[1]=length(x1)
-#q[1]=length(x2)
-
-#if (length(p)>1){
-#for (j in 2:concat){
-#p[j]=p[1]+(j-1)*length(y1)
-#q[j]=q[1]+(j-1)*length(y1)
-#}
-#}
-
-#joins[a]=p
-#joins[b]=q
-joins=c(length(x1))
+#initialise_transition_matrices
+initialise_transition_matrices_power <- function(r, f)
+{ 
+  P=array(1/f,c(f,f,r)) 
+  diag.prob = 0.9    ## probability of staying in state i
+  lambda = matrix((1-diag.prob)/(r-1),nrow=r,ncol=r)
+  for(k in 1:r){
+    lambda[k,k]=diag.prob
+  }
+  return(list(lambda=lambda, P=P))
+}
 
 
-
-powerpost(40,0.99,0.01,iterations,r,f,y,4000,joins)
+# powerpost(40,0.99,0.01,iterations,r,f,y,4000,joins)
