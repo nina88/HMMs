@@ -67,9 +67,9 @@ FBpower = function(y, lambda, p, t)
 
 ####################################
 
-powerpost=function(N, prior, m, r, y, K, checkpoint){
+powerpost=function(N, prior, m, r, y, burnin, checkpoint=NULL){
   
-  ### inset class checks here  
+  ### insert class checks here  
   
   ##### sort out joins
   if (length(y$join)==2) {
@@ -83,11 +83,6 @@ powerpost=function(N, prior, m, r, y, K, checkpoint){
   y=y$fasta_seq
   y=factor(y,levels=1:f)
   n = length(y)
-  
-  
- 
- 
-
   
   ##### check for lambda and P existing/ initialise them
   init = initialise_power(prior, f, r, checkpoint)
@@ -143,35 +138,22 @@ powerpost=function(N, prior, m, r, y, K, checkpoint){
         
             ### step 2: c: estimate the expectation
             ### calculate log likelihood
-            ###### calculate log likelihood for transition probabilities (P)
-            P.loglike = numeric(r)
-            for (l in 1:r){
-                P.loglike[l]=sum(y.trans[,,l]*log(P[,,l]))
-            }
-  
-            ###### calculate log likelihood for transition probabilities (lambda)
-            lambda.loglike = sum(s.trans*log(lambda))
-     
-            ##### find log like and log post
-            loglike = sum(P.loglike)+lambda.loglike+log(1/(f*r))
+            loglike = log_likelihood(P, lambda, y.trans, s.trans, r, f)
             loglike.store[h]=loglike
           
         } 
         ### step 2 c (not need be in l)
-        write.table(loglike.store,file="loglike", append=T, row.names=F, col.names=F)
-        expectation[i+1]=mean(loglike.store[K:m])
+        #write.table(loglike.store,file="loglike", append=T, row.names=F, col.names=F)
+        expectation[i+1]=mean(loglike.store[burnin:m])
         
         ### step 2 d  new lambda and P
-        expectation.lambda=apply(lambda.store[K:m,],2,mean)
-        expectation.P=apply(P.store[K:m,],2,mean)
+        expectation.lambda=apply(lambda.store[burnin:m,],2,mean)
+        expectation.P=apply(P.store[burnin:m,],2,mean)
         lambda=matrix(expectation.lambda,nrow=r,ncol=r)
         P=array(expectation.P,c(f,f,r))   
         
         ##### checkpointing system
-        write.csv(as.vector(lambda),file="lambda.txt")
-        write.csv(as.vector(P),file="P.txt")
-        write.table(expectation[i+1],file="expectation.txt", append=T, row.names=F, col.names=F)
-        write.csv(i+1, file="count.txt")
+        checkpoint_files_power(lambda, P, expectation, count, i, checkpoint)
   }
   
   #### step 3 calculate logp_PP(y|r)
@@ -185,12 +167,20 @@ powerpost=function(N, prior, m, r, y, K, checkpoint){
       }
   logpPP=sum(logpPP.store)
   write.csv(logpPP,file="logpPP.txt")
-  return(list(logpPP,loglike.store))
+  return(list(logpPP=logpPP))
 }
 
 ####################################################################################################
 ####################################################################################################
 ### note needs to be changed
+
+checkpoint_files_power <- function(lambda, P, expectation, count, i, checkpoint)
+{
+  count=i+1
+  if (!is.null(checkpoint)){
+    save(lambda, P, expectation, count, file=checkpoint$filename)
+  }  
+}
 
 class_check_power <- function(y, prior, checkpoint, iter, thin)
 {
@@ -221,7 +211,7 @@ class_check_power <- function(y, prior, checkpoint, iter, thin)
   return(hour)
 }
 
-initialise<- function(prior, f, r, checkpoint)
+initialise_power<- function(prior, f, r, checkpoint)
 { 
   if (is.null(checkpoint)) {
     message("Making files")
@@ -256,6 +246,14 @@ initialise_transition_matrices_power <- function(r, f)
     lambda[k,k]=diag.prob
   }
   return(list(lambda=lambda, P=P))
+}
+
+#########
+initialise_checkpoint_power = function(filename) 
+{ 
+  cp=list(filename=filename)
+  class(cp)="hmm_checkpoint"
+  return(cp)
 }
 
 
