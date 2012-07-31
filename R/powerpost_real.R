@@ -66,7 +66,7 @@ FBpower = function(y, lambda, P, t)
     s[i] = sample(1:r, 1, prob = back[,s[i+1],i])
   }
   ## return the global estimate
-  return(list(s = s, xi=xi, back=back))
+  return(list(s = s, xi=xi, back=back, f=f))
 }
 
 ####################################
