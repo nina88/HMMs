@@ -5,6 +5,14 @@ Version: 0.1
 Date: 2012-06-21
 Author: Nina Wilkinson
 Maintainer: Nina Wilkinson <nina.wilkinson@newcastle.ac.uk>
-Depends: testthat
+Depends:
+    testthat
 Description: Contains functions to work with Hidden Markov Models.
 License: LGPL
+Collate:
+    'equil.R'
+    'FB.R'
+    'gibbs.R'
+    'label.switch.R'
+    'powerpost_real.R'
+    'read_FASTA.R'

@@ -1,6 +1,18 @@
 ####################################################
 #Public functions
 ####################################################
+#' The forward--backward algorithm
+#'
+#' @param y An hmm_fasta object
+#' @param lambda hidden sequence transition matrix
+#' @param P array of transition matrices for observed sequence
+#' @return \item{s }{segmentation} 
+#'  \item{xi }{normalising constant}
+#'  \item{back}{backwards probabilities}
+#' @keywords character
+#' @export
+
+
 FB <-
 function(y, lambda, P)
 {
