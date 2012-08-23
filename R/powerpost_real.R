@@ -1,7 +1,17 @@
 ####################################################
 #Public functions
 ####################################################
-
+#' The forward--backward algorithm for the power posterior method
+#'
+#' @param y An hmm_fasta object
+#' @param lambda hidden sequence transition matrix
+#' @param P array of transition matrices for observed sequence
+#' @param t temperature parameter
+#' @return \item{s }{segmentation} 
+#'  \item{xi }{normalising constant}
+#'  \item{back}{backwards probabilities}
+#' @keywords character
+#' @export
 ##### took out lambdas to the power of t
 FBpower = function(y, lambda, P, t)
 {
@@ -66,11 +76,24 @@ FBpower = function(y, lambda, P, t)
     s[i] = sample(1:r, 1, prob = back[,s[i+1],i])
   }
   ## return the global estimate
-  return(list(s = s, xi=xi, back=back, f=f))
+  return(list(s = s, xi=xi, back=back))
 }
 
 ####################################
-
+#' The power posterior method
+#'
+#' @aliases checkpoint_files_power.R class_check_power.R initialise_power.R initialise_transition_matrices_power.R
+#' @param N number of temperature parameters required minus 1
+#' @param y An hmm_fasta object
+#' @param prior "prior_parameters" class object
+#' @param m number of iterations per temperature parameter
+#' @param r number of segment types
+#' @param burnin amount of burn in required
+#' @param checkpoint "hmm_checkpoint" object or NULL if checkpointing not required
+#' @return \item{logpPP }{marginal likelihood for r} 
+#' @keywords character
+#' @export
+#' 
 powerpost=function(N, prior, m, r, y, burnin, checkpoint=NULL){
   
   ### insert class checks here  
@@ -175,7 +198,13 @@ powerpost=function(N, prior, m, r, y, burnin, checkpoint=NULL){
 }
 
 #########
-
+#' Initialising checkpointing for the power posterior method
+#'
+#' @param filename filename
+#' @return \item{cp }{"hmm_checkpoint" object} 
+#' @keywords character
+#' @export
+#'
 initialise_checkpoint_power = function(filename) 
 { 
   cp=list(filename=filename)
