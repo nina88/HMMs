@@ -161,7 +161,7 @@ initialise_prior <- function(a, mu, s, r)
 
 #' Initialising checkpointing
 #'
-#' @param filename location for checkpointing files
+#' @param filename name of file for checkpointing
 #' @param hour how often checkpointing is required in number of iterations
 #' @return \item{cp }{"hmm_checkpoint" object} 
 #' @keywords character
