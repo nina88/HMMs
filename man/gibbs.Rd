@@ -1,41 +1,33 @@
 \name{gibbs}
+\alias{checkpoint_files.R}
+\alias{class_check.R}
 \alias{gibbs}
-\alias{initialise}
-\alias{checkpoint}
-\alias{initialise_prior}
-\alias{initialise_checkpoint}
-\alias{log_prior}
-\alias{log_likelihood}
-\alias{initialise_transition_matrices}
-\alias{class_check}
-\title{
-Gibbs sampling
-}
-\description{
-Gibbs sampling for HMMs
-}
+\alias{initialise.R}
+\alias{initialise_transition_matrices.R}
+\alias{log_likelihood.R}
+\alias{log_prior.R}
+\title{Gibbs sampling algorithm}
 \usage{
-gibbs(y, iter, prior, r, burnin, thin, checkpoint = NULL)
+  gibbs(y, iter, prior, r, burnin, thin, checkpoint = NULL)
 }
 \arguments{
-  \item{y}{hmm_fasta object}
+  \item{y}{An hmm_fasta object}
+
   \item{iter}{number of iterations}
-  \item{prior}{prior object}
-  \item{r}{number of hidden states}
-  \item{checkpoint}{checkpoint object if checkpointing is required. Make checkpoint a multiple of thin}
-  \item{thin}{what you would like to thin the results by}
-  \item{burnin}{burnin size you would like to remove}
-}
-\details{}
-\value{
-\item{lambda }{transition matrix for hidden sequence}
-\item{P }{array of r transition matrices}
-}
-\references{}
-\author{Nina Wilkinson}
-\note{}
 
-\seealso{}
-\examples{
+  \item{prior}{"prior_parameters" class object}
 
+  \item{r}{number of segment types}
+
+  \item{burnin}{amount of burnin required}
+
+  \item{thin}{amount of thinning wanted}
+
+  \item{checkpoint}{"hmm_checkpoint" object if
+  checkpointing wanted or NULL if not wanted}
 }
+\description{
+  Gibbs sampling algorithm
+}
+\keyword{character}
+

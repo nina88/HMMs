@@ -1,6 +1,18 @@
 ####################################################
 #Public functions
 ####################################################
+#' Gibbs sampling algorithm
+#'
+#' @aliases class_check.R checkpoint_files.R log_prior.R log_likelihood.R initialise.R initialise_transition_matrices.R
+#' @param y An hmm_fasta object
+#' @param iter number of iterations
+#' @param prior "prior_parameters" class object
+#' @param r number of segment types
+#' @param burnin amount of burnin required
+#' @param thin amount of thinning wanted
+#' @param checkpoint "hmm_checkpoint" object if checkpointing wanted or NULL if not wanted
+#' @keywords character
+#' @export
 
 #initialise_output
 
@@ -127,6 +139,15 @@ gibbs <- function(y, iter, prior, r, burnin, thin, checkpoint = NULL)
 ##Restart argument =TRUE or FALSE
 ##Change to initialise_state
 
+#' Initialising the prior
+#'
+#' @param a prior value for the observed sequence
+#' @param mu prior mean of the hidden sequence
+#' @param s prior standard deviation for the hidden sequence
+#' @return \item{prior }{"prior_parameters" object} 
+#' @keywords character
+#' @export
+#' 
 initialise_prior <- function(a, mu, s, r)
 {
   c = ((mu^2*(1-mu))/(s^2))-mu
@@ -138,6 +159,14 @@ initialise_prior <- function(a, mu, s, r)
   return(prior)
 }
 
+#' Initialising checkpointing
+#'
+#' @param filename location for checkpointing files
+#' @param hour how often checkpointing is required in number of iterations
+#' @return \item{cp }{"hmm_checkpoint" object} 
+#' @keywords character
+#' @export
+#'
 
 #########
 initialise_checkpoint = function(filename, hour) 

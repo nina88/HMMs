@@ -1,5 +1,8 @@
 export(combine_FASTA)
 export(FB)
+export(gibbs)
 export(hmm.sim)
+export(initialise_checkpoint)
+export(initialise_prior)
 export(label_switch)
 export(read_FASTA)
