@@ -1,6 +1,20 @@
 ####################################################
 #Public functions
 ####################################################
+#' Label switching
+#'
+#' @aliases order_of_firsts.R permutations.R permut.R
+#' @param segment.store2 segmentation at iteration i
+#' @param segment.store1 segmentation at iteration i-1
+#' @param r number of segment types
+#' @param lambda transition matrix for hidden sequence
+#' @param P array of transition matrices for observed sequence
+#' @param f number of possible states of observed sequence
+#' @return \item{segment.store2 }{segmentation after label switching corrected for} 
+#'  \item{P }{tranition matrix P after label switching corrected for }
+#'  \item{lambda}{trabsition matric lambda after label switching corrected for}
+#' @keywords character
+#' @export
 
 label_switch <-
   function(segment.store2,segment.store1, r, lambda, P, f)

@@ -1,5 +1,7 @@
 \name{hmm.sim}
+\alias{equil}
 \alias{hmm.sim}
+\alias{rdiric}
 \title{Simulates a hidden Markov model}
 \usage{
   hmm.sim(n, lambda, P, f)

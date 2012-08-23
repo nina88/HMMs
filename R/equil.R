@@ -22,7 +22,8 @@ rdiric <-
 #Public functions
 ####################################################
 #' Simulates a hidden Markov model
-#'
+#' 
+#' @aliases equil rdiric
 #' @param n Length of the observed sequence
 #' @param lambda The hidden sequence transition matrix
 #' @param P An array of transition matrices for observed sequence

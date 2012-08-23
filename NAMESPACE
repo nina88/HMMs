@@ -1,3 +1,4 @@
 export(FB)
 export(hmm.sim)
+export(label_switch)
 export(read_FASTA)
