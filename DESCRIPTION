@@ -6,7 +6,7 @@ Date: 2012-06-21
 Author: Nina Wilkinson
 Maintainer: Nina Wilkinson <nina.wilkinson@newcastle.ac.uk>
 Depends:
-    testthat
+    testthat, inline, RcppArmadillo
 Description: Contains functions to work with Hidden Markov Models.
 License: LGPL
 Collate:
