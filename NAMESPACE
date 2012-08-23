@@ -1,3 +1,4 @@
+export(combine_FASTA)
 export(FB)
 export(hmm.sim)
 export(label_switch)

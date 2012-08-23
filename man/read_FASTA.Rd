@@ -1,5 +1,7 @@
 \name{read_FASTA}
+\alias{convert}
 \alias{read_FASTA}
+\alias{reduce_FASTA}
 \title{Makes hmm_fasta object}
 \usage{
   read_FASTA(filename, level)
