@@ -29,6 +29,7 @@ convert = function(fasta_seq, level) {
 ####################################################
 #' Makes hmm_fasta object
 #'
+#' @aliases convert reduce_FASTA
 #' @param filename location of file
 #' @param level value of f
 #' @author Nina Wilkinson
@@ -45,7 +46,14 @@ read_FASTA <- function(filename, level)
     return(object)
 }
 
-
+#' Combines hmm_fasta objects
+#'
+#' @param protein1 hmm_fasta object
+#' @param protein2 hmm_fasta object
+#' @author Nina Wilkinson
+#' @return \item{object}{hmm_fasta object}
+#' @keywords character
+#' @export
 combine_FASTA = function(protein1,protein2){
     if (identical(class(protein1),class(protein2))!=TRUE) {
         stop("Objects are from different classes")
