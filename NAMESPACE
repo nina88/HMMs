@@ -1,3 +1,4 @@
 export(FB)
 export(hmm.sim)
 export(read_FASTA)
+export(gibbs)
