@@ -1,18 +1,3 @@
-####################################################
-#Public functions
-####################################################
-#' The forward--backward algorithm
-#'
-#' @param y An hmm_fasta object
-#' @param lambda hidden sequence transition matrix
-#' @param P array of transition matrices for observed sequence
-#' @return \item{s }{segmentation} 
-#'  \item{xi }{normalising constant}
-#'  \item{back}{backwards probabilities}
-#' @keywords character
-#' @export
-
-
 FB <-
 function(y, lambda, P)
 {
@@ -33,7 +18,7 @@ function(y, lambda, P)
   xi = numeric(n)  
 
   # observed data loglikelihood
-  lml = 0
+  #lml = 0
  
   #####################################################################
 
@@ -46,30 +31,32 @@ function(y, lambda, P)
   pi.lambda = equil(lambda)
   xi[1] = sum(pi.P[y[1], ]*pi.lambda)
   f[ ,1] = (pi.P[y[1], ]*pi.lambda)/xi[1]
-  lml = lml + log(xi[1])
+  #lml = lml + log(xi[1])
   
   #####################################################################
   
   ## calculate the forward probabilities using forward recursions
 
-  for(i in 2:n){
-    for(k in 1:r){
-      f[k, i] = P[y[i-1], y[i], k]*sum(lambda[ ,k]*f[ ,i-1])
-    } 
-    xi[i]=sum(f[ ,i])
-    f[ ,i] = f[ ,i]/xi[i]
-    lml = lml +log(xi[i])
-  }
-  
+  ##for(i in 2:n){
+   ## for(k in 1:r){
+   ##   f[k, i] = P[y[i-1], y[i], k]*sum(lambda[ ,k]*f[ ,i-1])
+  ##  } 
+  ##  xi[i]=sum(f[ ,i])
+ ##   f[ ,i] = f[ ,i]/xi[i]
+ ##   lml = lml +log(xi[i])
+ ## }
+  FW = forward(f, lambda, y, xi, P, dim(P))
+  f=FW[[1]]
 
   #####################################################################
   ## simulate backwards probabilities
-  for(i in (n-1):1){
-    back[, ,i] = lambda*f[,i]
-    for(k in 1:r){
-      back[ ,k,i] = back[ ,k,i]/sum(back[ ,k,i])
-      }
-  }
+  ##for(i in (n-1):1){
+  ##  back[, ,i] = lambda*f[,i]
+  ##  for(k in 1:r){
+   ##   back[ ,k,i] = back[ ,k,i]/sum(back[ ,k,i])
+    ##  }
+ ## }
+  back = backward(f, lambda, back, dim(back))
   
   #####################################################################
   ## Steps 5 and 6
@@ -81,5 +68,5 @@ function(y, lambda, P)
   }
   
   ## return the global estimate
-  return(list(s = s, xi=xi, back=back, f=f))
+  return(list(s = s, xi=xi, back=back))
 }

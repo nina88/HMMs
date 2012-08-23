@@ -19,8 +19,5 @@
 \description{
   The forward--backward algorithm
 }
-\author{
-  Nina Wilkinson
-}
 \keyword{character}
 

@@ -27,7 +27,14 @@ convert = function(fasta_seq, level) {
 ####################################################
 #Public functions
 ####################################################
-
+#' Makes hmm_fasta object
+#'
+#' @param filename location of file
+#' @param level value of f
+#' @author Nina Wilkinson
+#' @return \item{object}{hmm_fasta object}
+#' @keywords character
+#' @export
 read_FASTA <- function(filename, level)
 {
     fasta_seq=strsplit(paste(scan(filename,skip=1,what="character",comment.char=";"),collapse=""),"")[[1]]

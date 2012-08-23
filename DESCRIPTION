@@ -13,6 +13,6 @@ Collate:
     'equil.R'
     'FB.R'
     'gibbs.R'
-    'label.switch.R'
     'powerpost_real.R'
     'read_FASTA.R'
+    'label_switching.R'
