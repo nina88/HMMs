@@ -1,7 +1,7 @@
-require(inline)
-require(RcppArmadillo)
+#require(inline)
+#require(RcppArmadillo)
 
-src <- '
+src1 <- '
 
 Rcpp::NumericMatrix f(A);
 Rcpp::NumericMatrix lambda(B);
@@ -37,5 +37,5 @@ return Rcpp::wrap(Back);
 '
 
 
-backward <- cxxfunction(signature(A = "numeric",B="numeric",myArray="numeric",myDims="integer"), body = src, plugin="RcppArmadillo")
+backward <- cxxfunction(signature(A = "numeric",B="numeric",myArray="numeric",myDims="integer"), body = src1, plugin="RcppArmadillo")
 #backward(f,lambda,back,dim(back))

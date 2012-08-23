@@ -1,6 +1,5 @@
-
-require(inline)
-require(RcppArmadillo)
+#require(inline)
+#require(RcppArmadillo)
 
   src <- '
      Rcpp::NumericMatrix f(A);
