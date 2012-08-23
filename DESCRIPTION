@@ -6,7 +6,9 @@ Date: 2012-06-21
 Author: Nina Wilkinson
 Maintainer: Nina Wilkinson <nina.wilkinson@newcastle.ac.uk>
 Depends:
-    testthat, inline, RcppArmadillo
+    testthat,
+    inline,
+    RcppArmadillo
 Description: Contains functions to work with hidden Markov models
 License: LGPL
 Collate:
@@ -16,3 +18,5 @@ Collate:
     'powerpost_real.R'
     'read_FASTA.R'
     'label_switching.R'
+    'backward.R'
+    'forward.R'

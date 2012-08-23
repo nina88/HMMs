@@ -3,6 +3,7 @@
 ####################################################
 #' The forward--backward algorithm
 #'
+#' @aliases forward.R backward.R
 #' @param y An hmm_fasta object
 #' @param lambda hidden sequence transition matrix
 #' @param P array of transition matrices for observed sequence
