@@ -7,7 +7,7 @@
   FB(y, lambda, P)
 }
 \arguments{
-  \item{y}{An hmm_fasta object}
+  \item{y}{data from hmm_fasta object}
 
   \item{lambda}{hidden sequence transition matrix}
 

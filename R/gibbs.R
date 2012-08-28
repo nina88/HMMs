@@ -144,6 +144,7 @@ gibbs <- function(y, iter, prior, r, burnin, thin, checkpoint = NULL)
 #' @param a prior value for the observed sequence
 #' @param mu prior mean of the hidden sequence
 #' @param s prior standard deviation for the hidden sequence
+#' @param r number of segment types
 #' @return \item{prior }{"prior_parameters" object} 
 #' @keywords character
 #' @export

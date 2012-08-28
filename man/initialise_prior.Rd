@@ -11,6 +11,8 @@
 
   \item{s}{prior standard deviation for the hidden
   sequence}
+
+  \item{r}{number of segment types}
 }
 \value{
   \item{prior }{"prior_parameters" object}
