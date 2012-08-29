@@ -18,7 +18,7 @@
 
 gibbs <- function(y, iter, prior, r, burnin, thin, checkpoint = NULL)
 {
-  hour=class_check(y, prior, checkpoint, iter, thin)
+  hour=class_check(y, prior, checkpoint, iter, thin, burnin)
   
   ##### sort out joins
   if (length(y$join)==2) {
@@ -181,7 +181,7 @@ initialise_checkpoint = function(filename, hour)
 #Private functions
 ####################################################
 
-class_check <- function(y, prior, checkpoint, iter, thin)
+class_check <- function(y, prior, checkpoint, iter, thin, burnin)
 {
   if (class(y)!="hmm_fasta"){
     stop("Object y not from correct class")
@@ -204,8 +204,15 @@ class_check <- function(y, prior, checkpoint, iter, thin)
     hour = checkpoint$hour
     expect_that(checkpoint$filename, matches(".Rdata"))
     if (hour%%thin!=0){
-      stop("Hour and iter must be a multiple of thin")
+      stop("Hour must be a multiple of thin")
     }
+    if (iter%%hour!=0){
+      stop("Iter must be a multiple of hour")
+    }
+    if (burnin%%hour!=0){
+      stop("Hour must be a multiple of burnin")
+    }
+    
   }
   return(hour)
 }
