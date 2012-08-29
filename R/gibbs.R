@@ -45,7 +45,7 @@ gibbs <- function(y, iter, prior, r, burnin, thin, checkpoint = NULL)
   a=prior$a
     
   #### check not finished
-  if (count==iter+1) {
+  if (count>=iter+1) {
     message("Maximum iterations reached")
     break
   }
