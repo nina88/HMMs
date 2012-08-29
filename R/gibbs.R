@@ -106,7 +106,7 @@ gibbs <- function(y, iter, prior, r, burnin, thin, checkpoint = NULL)
       }
     
    
-    if (i >= burnin & i%%thin==0){
+    if (i > burnin & i%%thin==0){
       
       ### log posterior
       log.prior = log_prior(P, lambda, a, b, r, f)
