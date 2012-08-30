@@ -8,7 +8,12 @@ Maintainer: Nina Wilkinson <nina.wilkinson@newcastle.ac.uk>
 Depends:
     testthat,
     inline,
-    RcppArmadillo
+    RcppArmadillo,
+    Rcpp
+LinkingTo:   testthat,
+    inline,
+    RcppArmadillo,
+    Rcpp     
 Description: Contains functions to work with hidden Markov models
 License: LGPL
 Collate:
