@@ -1,3 +1,4 @@
+useDynLib(mypackage)
 export(combine_FASTA)
 export(FB)
 export(FBpower)
