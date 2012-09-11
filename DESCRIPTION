@@ -1,27 +1,12 @@
 Package: HMMs
 Type: Package
 Title: Hidden Markov models to analyse protein sequences
-Version: 0.1
-Date: 2012-06-21
+Version: 1.0
+Date: 2012-06-28
 Author: Nina Wilkinson
 Maintainer: Nina Wilkinson <nina.wilkinson@newcastle.ac.uk>
-Depends:
-    testthat,
-    inline,
-    RcppArmadillo,
-    Rcpp
-LinkingTo:   testthat,
-    inline,
-    RcppArmadillo,
-    Rcpp     
 Description: Contains functions to work with hidden Markov models
 License: LGPL
-Collate:
-    'equil.R'
-    'FB.R'
-    'gibbs.R'
-    'powerpost_real.R'
-    'read_FASTA.R'
-    'label_switching.R'
-    'backward.R'
-    'forward.R'
+Depends: Rcpp (>= 0.9.13), RcppArmadillo, testthat, inline
+LinkingTo: Rcpp, RcppArmadillo, testthat, inline
+Description: Contains functions to work with hidden Markov models
