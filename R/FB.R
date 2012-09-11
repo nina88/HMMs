@@ -52,26 +52,26 @@ function(y, lambda, P)
   
   ## calculate the forward probabilities using forward recursions
 
-  ##for(i in 2:n){
-   ## for(k in 1:r){
-   ##   f[k, i] = P[y[i-1], y[i], k]*sum(lambda[ ,k]*f[ ,i-1])
-  ##  } 
-  ##  xi[i]=sum(f[ ,i])
- ##   f[ ,i] = f[ ,i]/xi[i]
- ##   lml = lml +log(xi[i])
- ## }
-  FW = forward(f, lambda, y, xi, P, dim(P))
-  f=FW[[1]]
+  for(i in 2:n){
+    for(k in 1:r){
+      f[k, i] = P[y[i-1], y[i], k]*sum(lambda[ ,k]*f[ ,i-1])
+    } 
+    xi[i]=sum(f[ ,i])
+    f[ ,i] = f[ ,i]/xi[i]
+    lml = lml +log(xi[i])
+  }
+  ##FW = forward(f, lambda, y, xi, P, dim(P))
+  ##f=FW[[1]]
 
   #####################################################################
   ## simulate backwards probabilities
-  ##for(i in (n-1):1){
-  ##  back[, ,i] = lambda*f[,i]
-  ##  for(k in 1:r){
-   ##   back[ ,k,i] = back[ ,k,i]/sum(back[ ,k,i])
-    ##  }
- ## }
-  back = backward(f, lambda, back, dim(back))
+  for(i in (n-1):1){
+    back[, ,i] = lambda*f[,i]
+    for(k in 1:r){
+      back[ ,k,i] = back[ ,k,i]/sum(back[ ,k,i])
+      }
+  }
+  ##back = backward(f, lambda, back, dim(back))
   
   #####################################################################
   ## Steps 5 and 6

@@ -1,7 +1,5 @@
 \name{FB}
-\alias{backward.R}
 \alias{FB}
-\alias{forward.R}
 \title{The forward--backward algorithm}
 \usage{
   FB(y, lambda, P)
