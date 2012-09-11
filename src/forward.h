@@ -1,5 +1,5 @@
-#ifndef _mypackage_FORWARD_H
-#define _mypackage_FORWARD_H
+#ifndef _HMMs_FORWARD_H
+#define _HMMs_FORWARD_H
 
 #include <Rcpp.h>
 #include <RcppArmadillo.h>
