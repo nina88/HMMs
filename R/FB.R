@@ -62,7 +62,6 @@ function(y, lambda, P)
   #}
   FW = forward(f, lambda, y, xi, P, dim(P))
   f=FW[[1]]
-
   #####################################################################
   ## simulate backwards probabilities
   #for(i in (n-1):1){
