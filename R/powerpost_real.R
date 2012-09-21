@@ -115,7 +115,7 @@ powerpost=function(N, prior, m, r, y, burnin, checkpoint=NULL){
   n = length(y)
   
   ##### check for lambda and P existing/ initialise them
-  init = initialise_power(prior, f, r, checkpoint)
+  init = initialise_power(prior, f, r, checkpoint,N)
   lambda = init$lambda
   P = init$P
   expectation=init$expectation
@@ -128,7 +128,6 @@ powerpost=function(N, prior, m, r, y, burnin, checkpoint=NULL){
      
  ### step 2: a: set up temperature parameter t_i (in loop)
   loglike.store=numeric(m)
-  
  ### step 2: b: generate sample of theta from the power posterior
   for (i in count:N){
         t=(i/N)^4
