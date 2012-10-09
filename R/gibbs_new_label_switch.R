@@ -30,7 +30,7 @@ gibbs <- function(y, iter, prior, r, burnin, thin, checkpoint = NULL)
   #### find sequence and f and length of y (n)
   f=y$level
   y=y$fasta_seq
-  y=factor(y,levels=1:f)
+  y=factor(y, levels=1:f)
   n = length(y)
   
   ##### check for lambda and P existing/ initialise them
@@ -55,7 +55,7 @@ gibbs <- function(y, iter, prior, r, burnin, thin, checkpoint = NULL)
   ht = hour/thin
   posterior.temp = numeric(ht)
   lambda.store = matrix(0,nrow = ht, ncol=r^2)
-  P.store = matrix(0,nrow = ht, ncol=r*f^2)
+  P.store = matrix(0, nrow = ht, ncol=r*f^2)
   segment.store=matrix(0, nrow = ht, ncol=n)
   store_count = 1
   
@@ -129,7 +129,7 @@ gibbs <- function(y, iter, prior, r, burnin, thin, checkpoint = NULL)
         
       ## write lambda and P to file for checkpointing
       if (i%%hour==0) {
-        checkpoint_files(lambda, P,segment1, posterior.temp, P.store, lambda.store, segment.store, i, r, checkpoint)
+        checkpoint_files(lambda, P, segment1, posterior.temp, P.store, lambda.store, segment.store, i, r, checkpoint)
       }
       store_count = store_count + 1
       if (store_count == ht+1){

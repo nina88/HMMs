@@ -10,3 +10,5 @@ export(initialise_prior)
 export(label_switch)
 export(powerpost)
 export(read_FASTA)
+export(f2)
+

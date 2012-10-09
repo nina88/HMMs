@@ -13,7 +13,7 @@ for (i in 1:n){
 return(RT)
 }
 
-new_label_switch=function(RT,s,r,n,lambda,P,f)
+new_label_switch=function(RT, s, r, n, lambda, P, f)
 {
   ### calculate all permutations of s and calculate sum
   vec=numeric(factorial(r))
