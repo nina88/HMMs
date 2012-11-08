@@ -3,7 +3,7 @@
 ####################################################
 #' Gibbs sampling algorithm
 #'
-#' @aliases class_check.R checkpoint_files.R log_prior.R log_likelihood.R initialise.R initialise_transition_matrices.R
+#' @aliases class_check checkpoint_files log_prior log_likelihood initialise initialise_transition_matrices
 #' @param y An hmm_fasta object
 #' @param iter number of iterations
 #' @param prior "prior_parameters" class object
@@ -30,7 +30,7 @@ gibbs <- function(y, iter, prior, r, burnin, thin, checkpoint = NULL)
   #### find sequence and f and length of y (n)
   f=y$level
   y=y$fasta_seq
-  y=factor(y,levels=1:f)
+  y=factor(y, levels=1:f)
   n = length(y)
   
   ##### check for lambda and P existing/ initialise them
@@ -39,10 +39,11 @@ gibbs <- function(y, iter, prior, r, burnin, thin, checkpoint = NULL)
   P = init$P
   count=init$count
   segment1=init$segment1
+ 
   
   ### Prior parameter for lambda
   b=prior$b
-  a=prior$a
+  P.mat=prior$P.mat
     
   #### check not finished
   if (count>=iter+1) {
@@ -54,7 +55,7 @@ gibbs <- function(y, iter, prior, r, burnin, thin, checkpoint = NULL)
   ht = hour/thin
   posterior.temp = numeric(ht)
   lambda.store = matrix(0,nrow = ht, ncol=r^2)
-  P.store = matrix(0,nrow = ht, ncol=r*f^2)
+  P.store = matrix(0, nrow = ht, ncol=r*f^2)
   segment.store=matrix(0, nrow = ht, ncol=n)
   store_count = 1
   
@@ -71,16 +72,21 @@ gibbs <- function(y, iter, prior, r, burnin, thin, checkpoint = NULL)
       segment2 = segment2
       P = P
       lambda = lambda
+      RT = initialise_RT(r, segment2, n)
+     
       }
     else {
-      segm = label_switch(segment2, segment1, r,lambda, P, f)
-      segment2 = segm$segment.store2
+      segm = label_switch(RT, segment2, r, n, lambda, P, f)
+      segment2 = segm$s
+      
       P = segm$P
       lambda = segm$lambda
+      RT=segm$RT
+     
       }
     segment2 = factor(segment2, levels = 1:r)
     y = factor(y, levels = 1:f)
-    segment1 = segment2
+    
         
     ### find parameters for dirichlets
     s.trans = table(segment2[1:(n-1)], segment2[2:n]) 
@@ -97,7 +103,7 @@ gibbs <- function(y, iter, prior, r, burnin, thin, checkpoint = NULL)
     ### find p
     for (k in 1:r){
       for (j in 1:f){
-        P[j,,k] = rdiric(1, a+y.trans[j,,k])
+        P[j,,k] = rdiric(1, P.mat[j,,k]+y.trans[j,,k])
         }
       }
     ### find lambda
@@ -109,7 +115,7 @@ gibbs <- function(y, iter, prior, r, burnin, thin, checkpoint = NULL)
     if (i > burnin & i%%thin==0){
       
       ### log posterior
-      log.prior = log_prior(P, lambda, a, b, r, f)
+      log.prior = log_prior(P, lambda, P.mat, b, r, f)
       loglike.store = log_likelihood(P, lambda, y.trans, s.trans, r, f)  
       post = loglike.store+log.prior
       
@@ -117,11 +123,13 @@ gibbs <- function(y, iter, prior, r, burnin, thin, checkpoint = NULL)
       posterior.temp[store_count]=post
       P.store[store_count,]=as.vector(P)
       lambda.store[store_count,]=as.vector(lambda)
+      
+      
       segment.store[store_count,]=segment2
         
       ## write lambda and P to file for checkpointing
       if (i%%hour==0) {
-        checkpoint_files(lambda, P,segment1, posterior.temp, P.store, lambda.store, segment.store, i, r, checkpoint)
+        checkpoint_files(lambda, P, segment1, posterior.temp, P.store, lambda.store, segment.store, i, r, checkpoint)
       }
       store_count = store_count + 1
       if (store_count == ht+1){
@@ -141,21 +149,25 @@ gibbs <- function(y, iter, prior, r, burnin, thin, checkpoint = NULL)
 
 #' Initialising the prior
 #'
-#' @param a prior value for the observed sequence
+#' @param P.mat prior value for the observed sequence
 #' @param mu prior mean of the hidden sequence
 #' @param s prior standard deviation for the hidden sequence
 #' @param r number of segment types
+#' @param f is number of categories in amino acid sequence
 #' @return \item{prior }{"prior_parameters" object} 
 #' @keywords character
 #' @export
 #' 
-initialise_prior <- function(a, mu, s, r)
+initialise_prior <- function(P.mat, mu, s, r, f)
 {
+  if (identical(dim(P.mat),as.integer(c(f,f,r)))==FALSE){
+    stop("P must be an array of dimensions f by f by r")
+  }
   c = ((mu^2*(1-mu))/(s^2))-mu
   d = (c*(1-mu))/((r-1)*mu)
   b = matrix(d, ncol=r, nrow=r)
   diag(b) = c
-  prior = list(a=a, b=b)
+  prior = list(P.mat=P.mat, b=b)
   class(prior) = "prior_parameters"
   return(prior)
 }
@@ -232,9 +244,9 @@ checkpoint_files <- function(lambda, P, segment1, posterior.temp, P.store, lambd
 }
 ##### find log prior
 
-log_prior=function(P, lambda, a, b, r, f)
+log_prior=function(P, lambda, P.mat, b, r, f)
 {
-  P.prior = sum((a-1)*log(P))+r*f*lgamma(f*a)-r*(f^2)*lgamma(a)
+  P.prior = sum((P.mat-1)*log(P)) + sum(lgamma(colSums(P.mat))-colSums(lgamma(P.mat)))
   lambda.prior = sum((b-1)*log(lambda))+r*lgamma(sum(b[1,]))-r*sum(lgamma(b[1,]))
   log.prior = P.prior+lambda.prior
   return(log.prior)
@@ -286,10 +298,12 @@ initialise<- function(prior, f, r, checkpoint)
 initialise_transition_matrices <- function(prior, r, f)
 { 
   # P
-  a=prior$a
+  P.mat=prior$P.mat
   P=array(0,c(f,f,r))
   for(j in 1:r){
-    P[,,j] = rdiric(f,rep(a,f))
+    for (i in 1:f){
+    P[,,j] = rdiric(1,P.mat[i,,j])
+    }
   }
   
   ### lambda 

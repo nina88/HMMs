@@ -1,11 +1,11 @@
 \name{gibbs}
-\alias{checkpoint_files.R}
-\alias{class_check.R}
+\alias{checkpoint_files}
+\alias{class_check}
 \alias{gibbs}
-\alias{initialise.R}
-\alias{initialise_transition_matrices.R}
-\alias{log_likelihood.R}
-\alias{log_prior.R}
+\alias{initialise}
+\alias{initialise_transition_matrices}
+\alias{log_likelihood}
+\alias{log_prior}
 \title{Gibbs sampling algorithm}
 \usage{
   gibbs(y, iter, prior, r, burnin, thin, checkpoint = NULL)

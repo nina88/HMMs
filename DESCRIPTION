@@ -7,6 +7,19 @@ Author: Nina Wilkinson
 Maintainer: Nina Wilkinson <nina.wilkinson@newcastle.ac.uk>
 Description: Contains functions to work with hidden Markov models
 License: LGPL
-Depends: Rcpp (>= 0.9.13), RcppArmadillo, testthat, inline
+Depends:
+    Rcpp (>= 0.9.13),
+    RcppArmadillo,
+    testthat,
+    inline
 LinkingTo: Rcpp, RcppArmadillo, testthat, inline
-Description: Contains functions to work with hidden Markov models
+Collate:
+    'backward.R'
+    'equil.R'
+    'f2.R'
+    'FB.R'
+    'forward.R'
+    'gibbs.R'
+    'label_switching.R'
+    'powerpost_real.R'
+    'read_FASTA.R'

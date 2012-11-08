@@ -1,5 +1,7 @@
 \name{FBpower}
+\alias{checkpoint_files_power}
 \alias{FBpower}
+\alias{initialise_power}
 \title{The forward--backward algorithm for the power posterior method}
 \usage{
   FBpower(y, lambda, P, t)

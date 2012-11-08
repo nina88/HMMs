@@ -2,9 +2,11 @@
 #include "f2.h"
 #include "getcolumn.h"
 
-SEXP f2(){
+SEXP f2(SEXP C){
   using namespace Rcpp;
-  NumericVector x = f1();
+  int c = as<int>(C);
+  
+  NumericVector x = f1(Rcpp::wrap(c));
  x[0] = x[0] + 1;
 
   

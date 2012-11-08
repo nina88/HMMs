@@ -2,10 +2,10 @@
 \alias{initialise_prior}
 \title{Initialising the prior}
 \usage{
-  initialise_prior(a, mu, s, r)
+  initialise_prior(P.mat, mu, s, r, f)
 }
 \arguments{
-  \item{a}{prior value for the observed sequence}
+  \item{P.mat}{prior value for the observed sequence}
 
   \item{mu}{prior mean of the hidden sequence}
 
@@ -13,6 +13,8 @@
   sequence}
 
   \item{r}{number of segment types}
+
+  \item{f}{is number of categories in amino acid sequence}
 }
 \value{
   \item{prior }{"prior_parameters" object}

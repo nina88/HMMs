@@ -3,6 +3,7 @@
 ####################################################
 #' The forward--backward algorithm for the power posterior method
 #'
+#' @aliases checkpoint_files_power initialise_power
 #' @param y An hmm_fasta object
 #' @param lambda hidden sequence transition matrix
 #' @param P array of transition matrices for observed sequence
@@ -124,7 +125,7 @@ powerpost=function(N, prior, m, r, y, burnin, checkpoint=NULL){
   
   ### Prior parameters
   b=prior$b
-  a=prior$a
+  P.mat=prior$P.mat
      
  ### step 2: a: set up temperature parameter t_i (in loop)
   loglike.store=numeric(m)
@@ -132,7 +133,7 @@ powerpost=function(N, prior, m, r, y, burnin, checkpoint=NULL){
   for (i in count:N){
         t=(i/N)^4
         print(t)
-        #### need a,b s.trans and y.trans from gibbs sampling
+        #### need P,mat,b s.trans and y.trans from gibbs sampling
         ### storage for P and lambda
         lambda.store=matrix(0,nrow=m, ncol=r^2)
         P.store=matrix(0,nrow=m, ncol=r*f^2)
@@ -155,7 +156,7 @@ powerpost=function(N, prior, m, r, y, burnin, checkpoint=NULL){
             ### find p
             for (k in 1:r){
                 for (j in 1:f){
-                    P[j,,k] = rdiric(1, a+t*y.trans[j,,k])
+                    P[j,,k] = rdiric(1, P.mat[j,,k]+t*y.trans[j,,k])
                 }  
             }
             ### find lambda
@@ -257,7 +258,7 @@ initialise_power<- function(prior, f, r, checkpoint, N)
 { 
   if (is.null(checkpoint)) {
     message("Making files")
-    transition_matrices = initialise_transition_matrices_power(r, f)
+    transition_matrices = initialise_transition_matrices_power(r, f, prior)
     lambda = transition_matrices$lambda
     P = transition_matrices$P
     count = 0
@@ -268,7 +269,7 @@ initialise_power<- function(prior, f, r, checkpoint, N)
     load(checkpoint$filename)
   } else {
     message("Making files")
-    transition_matrices = initialise_transition_matrices_power(r, f)
+    transition_matrices = initialise_transition_matrices_power(r, f, prior)
     lambda = transition_matrices$lambda
     P = transition_matrices$P
     count = 0
@@ -279,15 +280,28 @@ initialise_power<- function(prior, f, r, checkpoint, N)
 
 
 #initialise_transition_matrices
-initialise_transition_matrices_power <- function(r, f)
+initialise_transition_matrices_power <- function(r, f, prior)
 { 
-  P=array(1/f,c(f,f,r)) 
-  diag.prob = 0.9    ## probability of staying in state i
-  lambda = matrix((1-diag.prob)/(r-1),nrow=r,ncol=r)
-  for(k in 1:r){
-    lambda[k,k]=diag.prob
+  ## initialise at prior mean
+  P = array(0,c(f,f,r)) 
+  P.mat = prior$P.mat
+  b = prior$b
+  for (k in 1:r){
+    for (j in 1:f){
+      rsum = sum(P.mat[j,,k])
+      for (l in 1:f){
+      P[j,l,k] = P.mat[j,l,k]/rsum
+      }
+    }  
   }
-  return(list(lambda=lambda, P=P))
+  lambda = matrix(0, nrow=r, ncol=r)
+  for (k in 1:r){
+    rsum=sum(b[k,])
+    for (j in 1:r){
+    lambda[k,j] = b[k,j]/rsum 
+    }
+  } 
+  return(list(lambda = lambda, P = P))
 }
 
 #########
