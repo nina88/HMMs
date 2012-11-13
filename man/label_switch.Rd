@@ -1,6 +1,7 @@
 \name{label_switch}
 \alias{initialise_RT}
 \alias{label_switch}
+\alias{order_of_firsts}
 \alias{permut}
 \alias{permutations}
 \title{Label switching}

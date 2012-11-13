@@ -3,7 +3,7 @@
 ####################################################
 #' Label switching
 #'
-#' @aliases initialise_RT permutations permut
+#' @aliases initialise_RT permutations permut order_of_firsts
 #' @param RT counts for each simulated sequnce
 #' @param s current segmentation sequence
 #' @param r number of segment types
@@ -144,6 +144,17 @@ permutations <-
       }
     }
     sub(n, r, v[1:n])
+  }
+
+###
+
+order_of_firsts <-
+  function(data, length){
+    first = array()
+    for(i in 1:length){
+      first[i] = which(data==i)[1]
+    }
+    order(first)
   }
 
 

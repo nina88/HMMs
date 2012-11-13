@@ -3,6 +3,7 @@
 ####################################################
 #' Gibbs sampling algorithm
 #'
+#' @useDynLib HMMs
 #' @aliases class_check checkpoint_files log_prior log_likelihood initialise initialise_transition_matrices
 #' @param y An hmm_fasta object
 #' @param iter number of iterations

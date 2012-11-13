@@ -16,10 +16,10 @@ LinkingTo: Rcpp, RcppArmadillo, testthat, inline
 Collate:
     'backward.R'
     'equil.R'
-    'f2.R'
     'FB.R'
     'forward.R'
     'gibbs.R'
     'label_switching.R'
     'powerpost_real.R'
     'read_FASTA.R'
+

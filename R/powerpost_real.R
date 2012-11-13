@@ -4,9 +4,7 @@
 #' The forward--backward algorithm for the power posterior method
 #'
 #' @aliases checkpoint_files_power initialise_power
-#' @param y An hmm_fasta object
-#' @param lambda hidden sequence transition matrix
-#' @param P array of transition matrices for observed sequence
+#' @inheritParams FB
 #' @param t temperature parameter
 #' @return \item{s }{segmentation} 
 #'  \item{xi }{normalising constant}

@@ -7,14 +7,14 @@
   FBpower(y, lambda, P, t)
 }
 \arguments{
-  \item{y}{An hmm_fasta object}
+  \item{t}{temperature parameter}
+
+  \item{y}{data from hmm_fasta object}
 
   \item{lambda}{hidden sequence transition matrix}
 
   \item{P}{array of transition matrices for observed
   sequence}
-
-  \item{t}{temperature parameter}
 }
 \value{
   \item{s }{segmentation} \item{xi }{normalising constant}
