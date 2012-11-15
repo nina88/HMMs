@@ -36,27 +36,17 @@ convert = function(fasta_seq, level) {
 #' @return \item{object}{hmm_fasta object}
 #' @keywords character
 #' @export
-read_FASTA <- function(filename, level)
+read_FASTA = function(filename, level)
 {
     fasta_seq=strsplit(paste(scan(filename,skip=1,what="character",comment.char=";"),collapse=""),"")[[1]]
-    fasta_seq=convert(fasta_seq, level)
-    join=c(1,length(fasta_seq))
-    object=list(fasta_seq=fasta_seq,level=level,join=join)
-    class(object) = "hmm_fasta"
-    return(object)
+    read_FASTA_string(fasta_seq, level)
 }
-#' Makes hmm_fasta object
-#'
 #' @aliases convert reduce_FASTA
-#' @param name of vector of strings
-#' @param level value of f
-#' @author Nina Wilkinson
-#' @return \item{object}{hmm_fasta object}
-#' @keywords character
+#' @param fasta_seq a vector of characters containing the FASTA sequence
 #' @export
-read_FASTA_string <- function(name, level)
+#' @rdname read_FASTA
+read_FASTA_string = function(fasta_seq, level)
 {
-  fasta_seq = name
   fasta_seq=convert(fasta_seq, level)
   join=c(1,length(fasta_seq))
   object=list(fasta_seq=fasta_seq,level=level,join=join)
@@ -64,15 +54,11 @@ read_FASTA_string <- function(name, level)
   return(object)
 }
 
-#' Combines hmm_fasta objects
-#'
-#' @param protein1 hmm_fasta object
-#' @param protein2 hmm_fasta object
-#' @author Nina Wilkinson
-#' @return \item{object}{hmm_fasta object}
-#' @keywords character
+#' @param protein1, protein2 an hmm_fasta object generated from the read_FASTA 
+#' function
+#' @rdname read_FASTA
 #' @export
-combine_FASTA = function(protein1,protein2){
+combine_FASTA = function(protein1, protein2){
     if (identical(class(protein1),class(protein2))!=TRUE) {
         stop("Objects are from different classes")
     }
@@ -82,6 +68,6 @@ combine_FASTA = function(protein1,protein2){
     vec=c(protein1$fasta_seq, protein2$fasta_seq)
     joins=c(protein1$join,protein2$join[2:length(protein2$join)]+protein1$join[length(protein1$join)])
     combine=list(fasta_seq=vec, level=protein1$level,join=joins)
-    class(combine) <- "hmm_fasta"
+    class(combine) = "hmm_fasta"
     return(combine)
 }
