@@ -57,6 +57,7 @@ read_FASTA <- function(filename, level)
 read_FASTA_string <- function(name, level)
 {
   fasta_seq = name
+  fasta_seq=convert(fasta_seq, level)
   join=c(1,length(fasta_seq))
   object=list(fasta_seq=fasta_seq,level=level,join=join)
   class(object) = "hmm_fasta"
