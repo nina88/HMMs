@@ -45,6 +45,23 @@ read_FASTA <- function(filename, level)
     class(object) = "hmm_fasta"
     return(object)
 }
+#' Makes hmm_fasta object
+#'
+#' @aliases convert reduce_FASTA
+#' @param name of vector of strings
+#' @param level value of f
+#' @author Nina Wilkinson
+#' @return \item{object}{hmm_fasta object}
+#' @keywords character
+#' @export
+read_FASTA_string <- function(name, level)
+{
+  fasta_seq = name
+  join=c(1,length(fasta_seq))
+  object=list(fasta_seq=fasta_seq,level=level,join=join)
+  class(object) = "hmm_fasta"
+  return(object)
+}
 
 #' Combines hmm_fasta objects
 #'
