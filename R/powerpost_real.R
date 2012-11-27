@@ -166,7 +166,7 @@ powerpost=function(N, prior, m, y, burnin, checkpoint=NULL){
         
             ### step 2: c: estimate the expectation
             ### calculate log likelihood
-            loglike = log_likelihood(P, lambda, y.trans, s.trans, r, f)
+            loglike = log_likelihood(P, lambda, y.trans, s.trans)
             loglike.store[h]=loglike
           
         } 

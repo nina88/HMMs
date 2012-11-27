@@ -18,7 +18,7 @@
 
 gibbs <- function(y, iter, prior, burnin, thin, checkpoint = NULL)
 {
-  hour=class_check(y, iter, prior, burnin, thin, cp)
+  hour=class_check(y, iter, prior, burnin, thin, checkpoint)
   
   ##### sort out joins
   if (length(y$join)==2) {
@@ -192,7 +192,7 @@ initialise_checkpoint = function(filename, hour)
 #Private functions
 ####################################################
 
-class_check <- function(y, iter, prior, burnin, thin, cp)
+class_check <- function(y, iter, prior, burnin, thin, checkpoint)
 {
   if (class(y)!="hmm_fasta"){
     stop("Object y not from correct class")

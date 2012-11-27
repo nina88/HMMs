@@ -10,7 +10,6 @@ License: LGPL
 Depends:
     Rcpp (>= 0.9.13),
     RcppArmadillo,
-    inline,
     testthat
 LinkingTo: Rcpp, RcppArmadillo, inline, testthat
 Collate:

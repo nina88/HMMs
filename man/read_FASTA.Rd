@@ -20,8 +20,11 @@
   \item{fasta_seq}{a vector of characters containing the
   FASTA sequence}
 
-  \item{protein1,}{protein2 an hmm_fasta object generated
-  from the read_FASTA function}
+  \item{protein1}{an hmm_fasta object generated from the
+  read_FASTA}
+
+  \item{protein2}{an hmm_fasta object generated from the
+  read_FASTA function}
 }
 \value{
   \item{object}{hmm_fasta object}

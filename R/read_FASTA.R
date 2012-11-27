@@ -54,7 +54,8 @@ read_FASTA_string = function(fasta_seq, level)
   return(object)
 }
 
-#' @param protein1, protein2 an hmm_fasta object generated from the read_FASTA 
+#' @param protein1 an hmm_fasta object generated from the read_FASTA 
+#' @param protein2 an hmm_fasta object generated from the read_FASTA
 #' function
 #' @rdname read_FASTA
 #' @export
