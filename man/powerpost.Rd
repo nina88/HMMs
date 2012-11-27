@@ -6,7 +6,7 @@
 \alias{powerpost}
 \title{The power posterior method}
 \usage{
-  powerpost(N, prior, m, r, y, burnin, checkpoint = NULL)
+  powerpost(N, prior, m, y, burnin, checkpoint = NULL)
 }
 \arguments{
   \item{N}{number of temperature parameters required minus
@@ -17,8 +17,6 @@
   \item{prior}{"prior_parameters" class object}
 
   \item{m}{number of iterations per temperature parameter}
-
-  \item{r}{number of segment types}
 
   \item{burnin}{amount of burn in required}
 

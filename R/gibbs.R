@@ -18,7 +18,7 @@
 
 gibbs <- function(y, iter, prior, burnin, thin, checkpoint = NULL)
 {
-  hour=class_check(y, prior, checkpoint, iter, thin, burnin)
+  hour=class_check(y, iter, prior, burnin, thin, cp)
   
   ##### sort out joins
   if (length(y$join)==2) {
@@ -35,7 +35,7 @@ gibbs <- function(y, iter, prior, burnin, thin, checkpoint = NULL)
   r=prior$r
   
   ##### check for lambda and P existing/ initialise them
-  init = initialise(prior, f, r, checkpoint)
+  init = initialise(prior, checkpoint)
   lambda = init$lambda
   P = init$P
   count=init$count
@@ -77,7 +77,7 @@ gibbs <- function(y, iter, prior, burnin, thin, checkpoint = NULL)
      
       }
     else {
-      segm = label_switch(RT, segment2, r, n, lambda, P, f)
+      segm = label_switch(RT, segment2, n, lambda, P)
       segment2 = segm$s
       
       P = segm$P
@@ -116,8 +116,8 @@ gibbs <- function(y, iter, prior, burnin, thin, checkpoint = NULL)
     if (i > burnin & i%%thin==0){
       
       ### log posterior
-      log.prior = log_prior(P, lambda, P.mat, b, r, f)
-      loglike.store = log_likelihood(P, lambda, y.trans, s.trans, r, f)  
+      log.prior = log_prior(P, lambda, P.mat, b)
+      loglike.store = log_likelihood(P, lambda, y.trans, s.trans)  
       post = loglike.store+log.prior
       
       ### temp store
@@ -165,7 +165,7 @@ initialise_prior <- function(P.mat, mu, s)
   d = (c*(1-mu))/((r-1)*mu)
   b = matrix(d, ncol=r, nrow=r)
   diag(b) = c
-  prior = list(P.mat=P.mat, b=b, r=r)
+  prior = list(P.mat=P.mat, b=b, r=r, f=f)
   class(prior) = "prior_parameters"
   message(paste("You have specified r =",r,"and f =",f))
   return(prior)
@@ -192,7 +192,7 @@ initialise_checkpoint = function(filename, hour)
 #Private functions
 ####################################################
 
-class_check <- function(y, prior, checkpoint, iter, thin, burnin)
+class_check <- function(y, iter, prior, burnin, thin, cp)
 {
   if (class(y)!="hmm_fasta"){
     stop("Object y not from correct class")
@@ -243,8 +243,9 @@ checkpoint_files <- function(lambda, P, segment1, posterior.temp, P.store, lambd
 }
 ##### find log prior
 
-log_prior=function(P, lambda, P.mat, b, r, f)
+log_prior=function(P, lambda, P.mat, b)
 {
+  r = dim(lambda)[1]
   P.prior = sum((P.mat-1)*log(P)) + sum(lgamma(colSums(P.mat))-colSums(lgamma(P.mat)))
   lambda.prior = sum((b-1)*log(lambda))+r*lgamma(sum(b[1,]))-r*sum(lgamma(b[1,]))
   log.prior = P.prior+lambda.prior
@@ -252,8 +253,10 @@ log_prior=function(P, lambda, P.mat, b, r, f)
 }
 
 ### find log likelihood
-log_likelihood=function(P,lambda,y.trans,s.trans,r,f)
+log_likelihood=function(P, lambda, y.trans, s.trans)
 {
+  r = dim(lambda)[1]
+  f = dim(P)[1]
   ###### calculate log likelihood for transition probabilities (P)
   P.loglike = numeric(r)
   for (l in 1:r){
@@ -270,11 +273,13 @@ log_likelihood=function(P,lambda,y.trans,s.trans,r,f)
 ###########
 
 
-initialise<- function(prior, f, r, checkpoint)
+initialise<- function(prior, checkpoint)
 { 
+  r=prior$r
+  f=prior$f
   if (is.null(checkpoint)) {
     message("Making files")
-    transition_matrices = initialise_transition_matrices(prior, r, f)
+    transition_matrices = initialise_transition_matrices(prior)
     lambda = transition_matrices$lambda
     P = transition_matrices$P
     count = 1
@@ -284,7 +289,7 @@ initialise<- function(prior, f, r, checkpoint)
     load(checkpoint$filename)
   } else {
     message("Making files")
-    transition_matrices = initialise_transition_matrices(prior, r, f)
+    transition_matrices = initialise_transition_matrices(prior)
     lambda = transition_matrices$lambda
     P = transition_matrices$P
     count = 1
@@ -294,9 +299,11 @@ initialise<- function(prior, f, r, checkpoint)
 }
 
 #initialise_transition_matrices
-initialise_transition_matrices <- function(prior, r, f)
+initialise_transition_matrices <- function(prior)
 { 
   # P
+  r=prior$r
+  f=prior$f
   P.mat=prior$P.mat
   P=array(0,c(f,f,r))
   for(j in 1:r){

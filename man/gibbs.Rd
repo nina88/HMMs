@@ -8,7 +8,7 @@
 \alias{log_prior}
 \title{Gibbs sampling algorithm}
 \usage{
-  gibbs(y, iter, prior, r, burnin, thin, checkpoint = NULL)
+  gibbs(y, iter, prior, burnin, thin, checkpoint = NULL)
 }
 \arguments{
   \item{y}{An hmm_fasta object}
@@ -16,8 +16,6 @@
   \item{iter}{number of iterations}
 
   \item{prior}{"prior_parameters" class object}
-
-  \item{r}{number of segment types}
 
   \item{burnin}{amount of burnin required}
 

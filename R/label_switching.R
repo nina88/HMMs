@@ -6,22 +6,22 @@
 #' @aliases initialise_RT permutations permut order_of_firsts
 #' @param RT counts for each simulated sequnce
 #' @param s current segmentation sequence
-#' @param r number of segment types
 #' @param n length of sequence
 #' @param lambda transition matrix for hidden sequence
 #' @param P array of transition matrices for observed sequence
-#' @param f number of possible states of observed sequence
 #' @return \item{RT}{counts}
-#' \item{s}{segmentation after label switching corrected for} 
-#'\item{P }{tranition matrix P after label switching corrected for }
+#'  \item{s}{segmentation after label switching corrected for} 
+#'  \item{P }{tranition matrix P after label switching corrected for }
 #'  \item{lambda}{trabsition matric lambda after label switching corrected for}
 #' @keywords character
 #' @export
 
 
 
-label_switch=function(RT, s, r, n, lambda, P, f)
-{
+label_switch=function(RT, s, n, lambda, P)
+{ 
+  r = dim(lambda)[1]
+  f = dim(P)[1]
   ### calculate all permutations of s and calculate sum
   vec=numeric(factorial(r))
   for (k in 1:factorial(r)){

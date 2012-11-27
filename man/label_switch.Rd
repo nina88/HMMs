@@ -6,14 +6,12 @@
 \alias{permutations}
 \title{Label switching}
 \usage{
-  label_switch(RT, s, r, n, lambda, P, f)
+  label_switch(RT, s, n, lambda, P)
 }
 \arguments{
   \item{RT}{counts for each simulated sequnce}
 
   \item{s}{current segmentation sequence}
-
-  \item{r}{number of segment types}
 
   \item{n}{length of sequence}
 
@@ -21,8 +19,6 @@
 
   \item{P}{array of transition matrices for observed
   sequence}
-
-  \item{f}{number of possible states of observed sequence}
 }
 \value{
   \item{RT}{counts} \item{s}{segmentation after label

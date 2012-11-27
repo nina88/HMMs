@@ -114,7 +114,7 @@ powerpost=function(N, prior, m, y, burnin, checkpoint=NULL){
   n = length(y)
   
   ##### check for lambda and P existing/ initialise them
-  init = initialise_power(prior, f, r, checkpoint,N)
+  init = initialise_power(prior, checkpoint,N)
   lambda = init$lambda
   P = init$P
   expectation=init$expectation
@@ -252,11 +252,13 @@ class_check_power <- function(y, prior, checkpoint)
   }
 }
 
-initialise_power<- function(prior, f, r, checkpoint, N)
+initialise_power<- function(prior, checkpoint, N)
 { 
+  r = prior$r
+  f = prior$f
   if (is.null(checkpoint)) {
     message("Making files")
-    transition_matrices = initialise_transition_matrices_power(r, f, prior)
+    transition_matrices = initialise_transition_matrices_power(prior)
     lambda = transition_matrices$lambda
     P = transition_matrices$P
     count = 0
@@ -267,7 +269,7 @@ initialise_power<- function(prior, f, r, checkpoint, N)
     load(checkpoint$filename)
   } else {
     message("Making files")
-    transition_matrices = initialise_transition_matrices_power(r, f, prior)
+    transition_matrices = initialise_transition_matrices_power(prior)
     lambda = transition_matrices$lambda
     P = transition_matrices$P
     count = 0
@@ -278,8 +280,10 @@ initialise_power<- function(prior, f, r, checkpoint, N)
 
 
 #initialise_transition_matrices
-initialise_transition_matrices_power <- function(r, f, prior)
+initialise_transition_matrices_power <- function(prior)
 { 
+  r = prior$r
+  f = prior$f
   ## initialise at prior mean
   P = array(0,c(f,f,r)) 
   P.mat = prior$P.mat
