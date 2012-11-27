@@ -8,7 +8,6 @@
 #' @param y An hmm_fasta object
 #' @param iter number of iterations
 #' @param prior "prior_parameters" class object
-#' @param r number of segment types
 #' @param burnin amount of burnin required
 #' @param thin amount of thinning wanted
 #' @param checkpoint "hmm_checkpoint" object if checkpointing wanted or NULL if not wanted
@@ -17,7 +16,7 @@
 
 #initialise_output
 
-gibbs <- function(y, iter, prior, r, burnin, thin, checkpoint = NULL)
+gibbs <- function(y, iter, prior, burnin, thin, checkpoint = NULL)
 {
   hour=class_check(y, prior, checkpoint, iter, thin, burnin)
   
@@ -33,6 +32,7 @@ gibbs <- function(y, iter, prior, r, burnin, thin, checkpoint = NULL)
   y=y$fasta_seq
   y=factor(y, levels=1:f)
   n = length(y)
+  r=prior$r
   
   ##### check for lambda and P existing/ initialise them
   init = initialise(prior, f, r, checkpoint)
@@ -153,23 +153,21 @@ gibbs <- function(y, iter, prior, r, burnin, thin, checkpoint = NULL)
 #' @param P.mat prior value for the observed sequence
 #' @param mu prior mean of the hidden sequence
 #' @param s prior standard deviation for the hidden sequence
-#' @param r number of segment types
-#' @param f is number of categories in amino acid sequence
 #' @return \item{prior }{"prior_parameters" object} 
 #' @keywords character
 #' @export
 #' 
-initialise_prior <- function(P.mat, mu, s, r, f)
+initialise_prior <- function(P.mat, mu, s)
 {
-  if (identical(dim(P.mat),as.integer(c(f,f,r)))==FALSE){
-    stop("P must be an array of dimensions f by f by r")
-  }
+  r=dim(P.mat)[3]
+  f=dim(P.mat)[1]
   c = ((mu^2*(1-mu))/(s^2))-mu
   d = (c*(1-mu))/((r-1)*mu)
   b = matrix(d, ncol=r, nrow=r)
   diag(b) = c
-  prior = list(P.mat=P.mat, b=b)
+  prior = list(P.mat=P.mat, b=b, r=r)
   class(prior) = "prior_parameters"
+  message(paste("You have specified r =",r,"and f =",f))
   return(prior)
 }
 

@@ -89,15 +89,15 @@ FBpower = function(y, lambda, P, t)
 #' @param y An hmm_fasta object
 #' @param prior "prior_parameters" class object
 #' @param m number of iterations per temperature parameter
-#' @param r number of segment types
 #' @param burnin amount of burn in required
 #' @param checkpoint "hmm_checkpoint" object or NULL if checkpointing not required
 #' @return \item{logpPP }{marginal likelihood for r} 
 #' @keywords character
 #' @export
 #' 
-powerpost=function(N, prior, m, r, y, burnin, checkpoint=NULL){
+powerpost=function(N, prior, m, y, burnin, checkpoint=NULL){
   
+  r = prior$r
   ### insert class checks here  
   class_check_power(y, prior, checkpoint)
   ##### sort out joins
