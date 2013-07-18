@@ -1,7 +1,6 @@
 #ifndef _HMMs_getcolumn_H
 #define _HMMs_getcolumn_H
 
-#include <Rcpp.h>
 #include <RcppArmadillo.h>
 
 /*

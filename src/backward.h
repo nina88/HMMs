@@ -1,7 +1,6 @@
 #ifndef _HMMs_BACKWARD_H
 #define _myHMMs_BACKWARD_H
 
-#include <Rcpp.h>
 #include <RcppArmadillo.h>
 
 /*
