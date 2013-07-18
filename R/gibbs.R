@@ -40,6 +40,7 @@ gibbs <- function(y, iter, prior, burnin, thin, checkpoint = NULL)
   P = init$P
   count=init$count
   segment1=init$segment1
+  RT=init$RT
  
   
   ### Prior parameter for lambda
