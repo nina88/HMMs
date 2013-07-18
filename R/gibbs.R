@@ -230,11 +230,11 @@ class_check <- function(y, iter, prior, burnin, thin, checkpoint)
 
 ##Store thin, burnin in checkpointing
 
-checkpoint_files <- function(lambda, P, segment1, posterior.temp, P.store, lambda.store, segment.store, i, r, checkpoint)
+checkpoint_files <- function(lambda, P, segment1, posterior.temp, P.store, lambda.store, segment.store, i, r, checkpoint, RT)
 {
   count=i+1
   if (!is.null(checkpoint)){
-    save(lambda,P,segment1,count,file=checkpoint$filename)
+    save(lambda,P,segment1,count,RT,file=checkpoint$filename)
   } 
   write.table(posterior.temp,file=paste("output",r,".csv",sep=""),append=T,row.names=F,col.names=F)
   write.table(P.store,file=paste("P.store",r,".csv",sep=""),append=T,row.names=F,col.names=F)
