@@ -130,7 +130,7 @@ gibbs <- function(y, iter, prior, burnin, thin, checkpoint = NULL)
         
       ## write lambda and P to file for checkpointing
       if (i%%hour==0) {
-        checkpoint_files(lambda, P, segment1, posterior.temp, P.store, lambda.store, segment.store, i, r, checkpoint)
+        checkpoint_files(lambda, P, segment1, posterior.temp, P.store, lambda.store, segment.store, i, r, checkpoint, RT)
       }
       store_count = store_count + 1
       if (store_count == ht+1){

@@ -12,7 +12,7 @@
 #' @return \item{RT}{counts}
 #'  \item{s}{segmentation after label switching corrected for} 
 #'  \item{P }{tranition matrix P after label switching corrected for }
-#'  \item{lambda}{trabsition matric lambda after label switching corrected for}
+#'  \item{lambda}{trabsition matrix lambda after label switching corrected for}
 #' @keywords character
 #' @export
 
