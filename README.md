@@ -28,13 +28,13 @@ You can run a power posterior analysis by firstly initialising the prior distrib
 
     r = 3
     P.mat = array(1, c(f, f, r))
-    prior = initialise_prior(P.mat, mu=0.99, s=0.01, r, f)
+    prior = initialise_prior(P.mat, mu=0.99, s=0.01)
     cp = initialise_checkpoint_power("cp.Rdata")
-    powerpost(N=40, prior, m=10000, r, y, burnin=2000, checkpoint = cp)
+    powerpost(N=40, prior, m=10000, y, burnin=2000, checkpoint = cp)
     
 
 Once you have a chosen value for r from your marginal posterior distribution for r you can then use Gibbs sampling to find out where the segments types are and what the transition structures are. You must initialise checkpointing and specify after how many iterations you would like checkpointing to happen (hour). You must again specify a burnin and how often you would line thinning to occur. iter is the number of iterations.
 
     cp = initialise_checkpoint("cp.Rdata", hour=500)
-    gibbs(y, iter=10000, prior, r, burnin=2000, thin=20, checkpoint = cp)
+    gibbs(y, iter=10000, prior, burnin=2000, thin=20, checkpoint = cp)
 
