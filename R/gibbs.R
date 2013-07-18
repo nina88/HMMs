@@ -295,7 +295,7 @@ initialise<- function(prior, checkpoint)
     count = 1
     segment1 = NA
   }
-  return(list(lambda = lambda, P = P, count = count, segment1 = segment1))
+  return(list(lambda = lambda, P = P, count = count, segment1 = segment1, RT=RT))
 }
 
 #initialise_transition_matrices
