@@ -41,7 +41,7 @@ gibbs <- function(y, iter, prior, burnin, thin, checkpoint = NULL)
   count=init$count
   segment1=init$segment1
   RT=init$RT
- 
+  print(RT)
   
   ### Prior parameter for lambda
   b=prior$b
