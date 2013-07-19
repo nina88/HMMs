@@ -285,6 +285,7 @@ initialise<- function(prior, checkpoint)
     P = transition_matrices$P
     count = 1
     segment1 = NA
+    RT=NA
   } else if (!is.null(checkpoint) & file.exists(checkpoint$filename)){
     message("Using existing files")
     load(checkpoint$filename)
@@ -295,8 +296,9 @@ initialise<- function(prior, checkpoint)
     P = transition_matrices$P
     count = 1
     segment1 = NA
+    RT=NA
   }
-  return(list(lambda = lambda, P = P, count = count, segment1 = segment1))
+  return(list(lambda = lambda, P = P, count = count, segment1 = segment1, RT=RT))
 }
 
 #initialise_transition_matrices
