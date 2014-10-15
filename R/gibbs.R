@@ -271,6 +271,22 @@ log_likelihood=function(P, lambda, y.trans, s.trans)
   return(loglike.store)
 }
 
+
+### find log likelihood
+log_likelihood_P=function(P, y.trans)
+{
+  f = dim(P)[1]
+  r = dim(P)[3]
+  ###### calculate log likelihood for transition probabilities (P)
+  P.loglike = numeric(r)
+  for (l in 1:r){
+    P.loglike[l]=sum(y.trans[,,l]*log(P[,,l]))
+  }
+  ##### find log like 
+  loglike.store = sum(P.loglike)+log(1/f)
+  return(loglike.store)
+}
+
 ###########
 
 

@@ -114,11 +114,12 @@ powerpost=function(N, prior, m, y, burnin, checkpoint=NULL){
   n = length(y)
   
   ##### check for lambda and P existing/ initialise them
-  init = initialise_power(prior, checkpoint,N)
+  init = initialise_power(prior, checkpoint,N,m)
   lambda = init$lambda
   P = init$P
   expectation=init$expectation
   count=init$count
+  loglike.store=init$loglike.store
   
   
   ### Prior parameters
@@ -126,7 +127,7 @@ powerpost=function(N, prior, m, y, burnin, checkpoint=NULL){
   P.mat=prior$P.mat
      
  ### step 2: a: set up temperature parameter t_i (in loop)
-  loglike.store=numeric(m)
+  #loglike.store=matrix(N+1,m)
  ### step 2: b: generate sample of theta from the power posterior
   for (i in count:N){
         t=(i/N)^4
@@ -139,6 +140,29 @@ powerpost=function(N, prior, m, y, burnin, checkpoint=NULL){
         for (h in 1:m){  
             st = FBpower(y, lambda, P,t)
             segment2 = st$s
+            
+            
+            ########### ADD LABEL SWITCHING
+            
+            #### label switching check
+            if (h==1){
+              segment2 = segment2
+              P = P
+              lambda = lambda
+              RT = initialise_RT(r, segment2, n)
+              
+            }
+            else {
+              segm = label_switch(RT, segment2, n, lambda, P)
+              segment2 = segm$s
+              
+              P = segm$P
+              lambda = segm$lambda
+              RT=segm$RT
+              
+            }
+            #######################
+            
             segment2 = factor(segment2, levels = 1:r)
             y = factor(y, levels = 1:f)
             ### find parameters for dirichlets
@@ -146,10 +170,12 @@ powerpost=function(N, prior, m, y, burnin, checkpoint=NULL){
             y.trans = table(y[1:(n-1)], y[2:n], segment2[2:n]) 
    
             # take off transitions between proteins
+            if(all(joins!=0)){
             for (q in 1:length(joins)){
               s.trans[segment2[joins[q]], segment2[joins[q]+1]] = s.trans[segment2[joins[q]], segment2[joins[q]+1]]-1
               y.trans[y[joins[q]], y[joins[q]+1],segment2[joins[q]+1]] = y.trans[y[joins[q]], y[joins[q]+1],segment2[joins[q]+1]]-1
-                    }
+              }
+            }
     
             ### find p
             for (k in 1:r){
@@ -159,20 +185,21 @@ powerpost=function(N, prior, m, y, burnin, checkpoint=NULL){
             }
             ### find lambda
             for (k in 1:r){
-                lambda[k,] = rdiric(1, b[k,]+t*s.trans[k,])
+                lambda[k,] = rdiric(1, b[k,]+s.trans[k,])
             } 
             lambda.store[h,]=as.vector(lambda)
             P.store[h,]=as.vector(P)
         
             ### step 2: c: estimate the expectation
             ### calculate log likelihood
-            loglike = log_likelihood(P, lambda, y.trans, s.trans)
-            loglike.store[h]=loglike
+            #loglike = log_likelihood(P, lambda, y.trans, s.trans)
+            loglike = log_likelihood_P(P, y.trans)
+            loglike.store[i+1,h]=loglike
           
         } 
         ### step 2 c (not need be in l)
         #write.table(loglike.store,file="loglike", append=T, row.names=F, col.names=F)
-        expectation[i+1]=mean(loglike.store[burnin:m])
+        expectation[i+1]=mean(loglike.store[i+1,burnin:m])
         
         ### step 2 d  new lambda and P
         expectation.lambda=apply(lambda.store[burnin:m,],2,mean)
@@ -181,7 +208,7 @@ powerpost=function(N, prior, m, y, burnin, checkpoint=NULL){
         P=array(expectation.P,c(f,f,r))   
         
         ##### checkpointing system
-        checkpoint_files_power(lambda, P, expectation, count, i, checkpoint)
+        checkpoint_files_power(lambda, P, expectation, count, i, checkpoint,loglike.store)
   }
   
   #### step 3 calculate logp_PP(y|r)
@@ -195,6 +222,8 @@ powerpost=function(N, prior, m, y, burnin, checkpoint=NULL){
       }
   logpPP=sum(logpPP.store)
   write.csv(logpPP,file="logpPP.txt")
+  write.csv(loglike.store,file="loglike.store.csv")
+  write.csv(expectation,file="expectation.csv")
   return(list(logpPP=logpPP))
 }
 
@@ -221,11 +250,11 @@ initialise_checkpoint_power = function(filename)
 ####################################################################################################
 ### note needs to be changed
 
-checkpoint_files_power <- function(lambda, P, expectation, count, i, checkpoint)
+checkpoint_files_power <- function(lambda, P, expectation, count, i, checkpoint,loglike.store)
 {
   count=i+1
   if (!is.null(checkpoint)){
-    save(lambda, P, expectation, count, file=checkpoint$filename)
+    save(lambda, P, expectation, count, loglike.store, file=checkpoint$filename)
   }  
 }
 
@@ -252,7 +281,7 @@ class_check_power <- function(y, prior, checkpoint)
   }
 }
 
-initialise_power<- function(prior, checkpoint, N)
+initialise_power<- function(prior, checkpoint, N, m)
 { 
   r = prior$r
   f = prior$f
@@ -263,6 +292,7 @@ initialise_power<- function(prior, checkpoint, N)
     P = transition_matrices$P
     count = 0
     expectation=numeric(N+1)
+    loglike.store=matrix(0,nrow=N+1,ncol=m)
 
   } else if (!is.null(checkpoint) & file.exists(checkpoint$filename)){
     message("Using existing files")
@@ -274,8 +304,9 @@ initialise_power<- function(prior, checkpoint, N)
     P = transition_matrices$P
     count = 0
     expectation=numeric(N+1)
+    loglike.store=matrix(0,nrow=N+1,ncol=m)
   }
-  return(list(lambda = lambda, P = P, count = count, expectation = expectation))
+  return(list(lambda = lambda, P = P, count = count, expectation = expectation, loglike.store=loglike.store))
 }
 
 

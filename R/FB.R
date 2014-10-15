@@ -33,7 +33,7 @@ function(y, lambda, P)
   xi = numeric(n)  
 
   # observed data loglikelihood
-  #lml = 0
+  lml = 0
  
   #####################################################################
 
@@ -46,7 +46,7 @@ function(y, lambda, P)
   pi.lambda = equil(lambda)
   xi[1] = sum(pi.P[y[1], ]*pi.lambda)
   f[ ,1] = (pi.P[y[1], ]*pi.lambda)/xi[1]
-  #lml = lml + log(xi[1])
+  lml = lml + log(xi[1])
   
   #####################################################################
   
@@ -62,6 +62,7 @@ function(y, lambda, P)
   #}
   FW = forward(f, lambda, y, xi, P, dim(P))
   f=FW[[1]]
+  lml=lml+FW[[2]]
   #####################################################################
   ## simulate backwards probabilities
   #for(i in (n-1):1){
@@ -82,5 +83,5 @@ function(y, lambda, P)
   }
   
   ## return the global estimate
-  return(list(s = s, xi=xi, back=back))
+  return(list(s = s, lml=lml, back=back))
 }
