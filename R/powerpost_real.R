@@ -141,28 +141,6 @@ powerpost=function(N, prior, m, y, burnin, checkpoint=NULL){
             st = FBpower(y, lambda, P,t)
             segment2 = st$s
             
-            
-            ########### ADD LABEL SWITCHING
-            
-            #### label switching check
-            if (h==1){
-              segment2 = segment2
-              P = P
-              lambda = lambda
-              RT = initialise_RT(r, segment2, n)
-              
-            }
-            else {
-              segm = label_switch(RT, segment2, n, lambda, P)
-              segment2 = segm$s
-              
-              P = segm$P
-              lambda = segm$lambda
-              RT=segm$RT
-              
-            }
-            #######################
-            
             segment2 = factor(segment2, levels = 1:r)
             y = factor(y, levels = 1:f)
             ### find parameters for dirichlets
