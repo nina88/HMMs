@@ -279,7 +279,7 @@ log_likelihood_P=function(P, y.trans)
   r = dim(P)[3]
   write.table(c(r,f),"rf.csv",col.names=F,row.names=F,sep=",",append=T)
   write.table(P,"Pstore.csv",col.names=F,row.names=F,sep=",",append=T)
-  write.table(as.vector(y.trans),"ytrans.csv",col.names=F,row.names=F,sep=",",append=T)
+  write.table(matrix(as.vector(y.trans),nrow=T),"ytrans.csv",col.names=F,row.names=F,sep=",",append=T)
   ###### calculate log likelihood for transition probabilities (P)
   P.loglike = numeric(r)
   for (l in 1:r){
